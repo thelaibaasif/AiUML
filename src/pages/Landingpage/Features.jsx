@@ -1,24 +1,100 @@
-export const Features = () => {
-    const features = [
-      { id: 1, title: "Text analysis, entity extraction", image: "/images/feature1.png" },
-      { id: 2, title: "From text to diagrams", image: "/images/feature2.png" },
-      { id: 3, title: "Pattern recognition & optimization", image: "/images/feature3.png" },
-      { id: 4, title: "Handles software descriptions", image: "/images/feature4.png" },
-      { id: 5, title: "Interactive editor & customization", image: "/images/feature5.png" },
-      { id: 6, title: "Class, use-case, ERD diagrams", image: "/images/feature6.png" },
-      { id: 7, title: "Export in SVG/PNG", image: "/images/feature7.png" },
-      { id: 8, title: "Stores previous diagrams", image: "/images/feature8.png" },
-    ];
-  
-    return (
-      <div className="features-grid">
-        {features.map((feature) => (
-          <div key={feature.id} className="feature-item">
-            <img src={feature.image} alt={feature.title} />
-            <p>{feature.title}</p>
+import React from "react";
+import feature1 from "../../images/feature1.jpeg";
+import feature2 from "../../images/feature2.png";
+import feature3 from "../../images/feature3.png";
+//import feature4 from "../../images/feature44.png";
+import feature4 from "../../images/feature444.png";
+import feature5 from "../../images/feature5.png";
+import feature6 from "../../images/feature66.png";
+//import feature6 from "../../images/feature666.png";
+//import feature6 from "../../images/feature6666.png";
+import feature7 from "../../images/feature7.png";
+import feature8 from "../../images/feature8.png";
+
+
+const features = [
+  {
+    id: "01",
+    title: "Text analysis, entity extraction, relationship mapping",
+    image: feature1,
+    bgClass: "",
+  },
+  {
+    id: "02",
+    title: "From text, software requirements, and simple prompts using GenerativeAI",
+    image: feature2,
+    bgClass: "bg-light-blue",
+  },
+  {
+    id: "03",
+    title: "Pattern recognition, optimization, and modeling complex relationships",
+    image: feature3,
+    bgClass: "",
+  },
+  {
+    id: "04",
+    title: "Can take software descriptions and requirements as well",
+    image: feature4,
+    bgClass: "bg-light-blue",
+  },
+  {
+    id: "05",
+    title: "Interactive editor, code editing, text commands, customization options",
+    image: feature5,
+    bgClass: "",
+  },
+  {
+    id: "06",
+    title: "Class, usecase, sequence, ERD diagrams",
+    image: feature6,
+    bgClass: "bg-light-blue",
+  },
+  {
+    id: "07",
+    title: "Export in SVG, PNG, and more",
+    image: feature7,
+    bgClass: "",
+  },
+  {
+    id: "08",
+    title: "Stores previous chats, diagrams, and their codes",
+    image: feature8,
+    bgClass: "bg-light-blue",
+  },
+];
+
+const Features = () => {
+  return (
+    <section className="container mx-auto px-0 py-16">
+      <h2 className="text-center text-red-700 font-bold text-2xl mb-8">
+        Features
+      </h2>
+      {features.map((feature, index) => (
+        <div
+          key={feature.id}
+          className={`${
+            feature.bgClass
+          } w-full py-12 ${index % 2 === 0 ? "flex-row" : "flex-row-reverse"} ${
+            feature.bgClass ? "px-0" : "px-8"
+          } flex items-center`}
+        >
+          <div className="w-1/2 p-8">
+            <img
+              src={feature.image}
+              alt={feature.title}
+              className="w-full h-auto"
+            />
           </div>
-        ))}
-      </div>
-    );
-  };
-  
+          <div className="w-1/2 text-center md:text-left p-8">
+            <h3 className="text-gray-800 text-4xl font-bold mb-4">
+              {feature.id}
+            </h3>
+            <p className="text-gray-600 text-lg">{feature.title}</p>
+          </div>
+        </div>
+      ))}
+    </section>
+  );
+};
+
+export default Features;

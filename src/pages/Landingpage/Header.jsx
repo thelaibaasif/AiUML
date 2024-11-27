@@ -1,52 +1,55 @@
 import React from 'react';
+import logo from "../../images/logo.png";
+import Illustration from "../../images/Illustration.png";
 
 const Header = () => {
-    return (
-      <div className="bg-light-blue min-h-screen">
-        {/* Header Section */}
-        <header className="bg-white shadow-md">
-          <div className="container mx-auto px-8 py-4 flex justify-between items-center">
-            {/* Logo */}
-            <div className="flex items-center space-x-2">
-              <img
-                src="/path-to-logo.png" // Replace with the actual logo path
-                alt="AiUML Logo"
-                className="w-10 h-10"
-              />
-              <h1 className="text-lg font-bold text-red-700">AiUML</h1>
-            </div>
-  
-            {/* Navigation */}
-            <nav className="hidden md:flex space-x-6">
-              <a href="#home" className="text-gray-600 hover:text-red-700">
-                Home
-              </a>
-              <a href="#about" className="text-gray-600 hover:text-red-700">
-                About us
-              </a>
-              <a href="#features" className="text-gray-600 hover:text-red-700">
-                Features
-              </a>
-              <a href="#contact" className="text-gray-600 hover:text-red-700">
-                Contact
-              </a>
-              <a href="#signup" className="text-gray-600 hover:text-red-700">
-                SignUp
-              </a>
-            </nav>
-  
-            {/* Login Button */}
-            <a
-              href="/login"
-              className="bg-red-700 text-white px-4 py-2 rounded-md font-semibold hover:bg-red-800"
-            >
-              Login
-            </a>
+  return (
+    <div className="bg-light-blue min-h-screen">
+      {/* Header Section */}
+      <header className="bg-white shadow-md sticky top-0 z-50">
+        <div className="container mx-auto px-6 py-4 flex justify-between items-center max-w-6xl">
+          {/* Logo */}
+          <div className="flex items-center space-x-2">
+            <img
+              src={logo}
+              alt="AiUML Logo"
+              className="w-10 h-10"
+            />
+            <h1 className="text-lg font-bold text-red-700">AiUML</h1>
           </div>
-        </header>
-  
-        {/* Hero Section */}
-        <section className="container mx-auto px-8 py-16 flex flex-col lg:flex-row items-center">
+
+          {/* Navigation */}
+          <nav className="hidden md:flex space-x-6">
+            <a href="#home" className="text-gray-600 hover:text-red-700">
+              Home
+            </a>
+            <a href="#about" className="text-gray-600 hover:text-red-700">
+              About us
+            </a>
+            <a href="#features" className="text-gray-600 hover:text-red-700">
+              Features
+            </a>
+            <a href="#contact" className="text-gray-600 hover:text-red-700">
+              Contact
+            </a>
+            <a href="#signup" className="text-gray-600 hover:text-red-700">
+              SignUp
+            </a>
+          </nav>
+
+          {/* Login Button */}
+          <a
+            href="#login"
+            className="bg-red-700 text-white px-4 py-2 rounded-md font-semibold hover:bg-red-800"
+          >
+            Login
+          </a>
+        </div>
+      </header>
+
+      {/* Hero Section */}
+      <section id="home" className="relative">
+        <div className="container mx-auto px-6 py-12 lg:py-20 flex flex-col lg:flex-row items-center max-w-6xl">
           {/* Text Content */}
           <div className="lg:w-1/2">
             <h1 className="text-4xl font-bold text-red-700 mb-4">
@@ -64,17 +67,22 @@ const Header = () => {
               Get Started <span className="ml-2">➡</span>
             </button>
           </div>
-  
+
           {/* Illustration */}
           <div className="lg:w-1/2 mt-10 lg:mt-0">
             <img
-              src="/path-to-uml-image.png" // Replace with the actual image path
+              src={Illustration}
               alt="UML Illustration"
               className="w-full h-auto"
             />
           </div>
-        </section>
-      </div>
-    );
-  };
-  export default Header;
+        </div>
+
+        {/* Bottom Curve */}
+        <div className="absolute bottom-0 right-0 left-0 bg-light-blue transform translate-y-1/2 rounded-t-[100px] lg:rounded-t-[200px]"></div>
+      </section>
+    </div>
+  );
+};
+
+export default Header;

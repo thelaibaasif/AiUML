@@ -1,15 +1,69 @@
-export const Footer = () => {
-    return (
-      <footer className="footer bg-gray-800 text-white">
-        <div className="flex justify-between p-4">
-          <p>© 2024 AiUML. All rights reserved.</p>
-          <div className="social-icons">
-            <a href="#">Facebook</a>
-            <a href="#">Twitter</a>
-            <a href="#">LinkedIn</a>
+import React from 'react';
+import { FaFacebook, FaTwitter, FaLinkedin, FaEnvelope, FaPhone, FaMapMarkerAlt } from 'react-icons/fa';
+
+const Footer = () => {
+  return (
+    <footer className="bg-gray-100 text-gray-700 py-8">
+      <div className="container mx-auto grid grid-cols-1 md:grid-cols-4 gap-8 px-4">
+        {/* Contact Section */}
+        <div>
+          <h4 className="font-bold mb-4">Contact</h4>
+          <ul className="space-y-2">
+            <li className="flex items-center">
+              <FaEnvelope className="mr-2" /> AiUML@gmail.com
+            </li>
+            <li className="flex items-center">
+              <FaPhone className="mr-2" /> +92 1234567890
+            </li>
+            <li className="flex items-center">
+              <FaMapMarkerAlt className="mr-2" /> Islamabad, Pakistan
+            </li>
+          </ul>
+        </div>
+
+        {/* Navigation Section */}
+        <div>
+          <h4 className="font-bold mb-4">Home</h4>
+          <ul className="space-y-2">
+            <li>Features</li>
+            <li>Our Diagrams</li>
+            <li>Our Customers</li>
+            <li>Our FAQ</li>
+          </ul>
+        </div>
+
+        <div>
+          <h4 className="font-bold mb-4">About Us</h4>
+          <ul className="space-y-2">
+            <li>Company</li>
+            <li>Achievements</li>
+            <li>Our Goals</li>
+          </ul>
+        </div>
+
+        {/* Social Profiles Section */}
+        <div>
+          <h4 className="font-bold mb-4">Social Profiles</h4>
+          <div className="flex space-x-4">
+            <a href="#" className="p-2 bg-gray-200 rounded-full">
+              <FaFacebook />
+            </a>
+            <a href="#" className="p-2 bg-gray-200 rounded-full">
+              <FaTwitter />
+            </a>
+            <a href="#" className="p-2 bg-gray-200 rounded-full">
+              <FaLinkedin />
+            </a>
           </div>
         </div>
-      </footer>
-    );
-  };
-  
+      </div>
+
+      {/* Bottom Copyright Section */}
+      <div className="text-center border-t border-gray-300 mt-8 pt-4 text-sm">
+        © 2024 AiUML. All rights reserved.
+      </div>
+    </footer>
+  );
+};
+
+export default Footer;
