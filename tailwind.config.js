@@ -6,15 +6,20 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        "light-blue": "#f0f8ff",
-        "red-700": "#AF2658",
-        "gray-600": "#4b5563",
-        "gray-800": "#1f2937",
-        'red-700': '#b91c1c',
+        "light-blue": "#EAF6FE", // Updated light blue color for the background
+        "red-700": "#B91C1C",   // Correct red-700 color
+        "gray-600": "#4B5563",  // Standard gray-600 for text
+        "gray-800": "#1F2937",  // Standard gray-800 for text
+        "pink-700": "#AF2658",  // Additional pink-red shade
+        "yellow-300": "#FFDE80", // Match your border color
       },
       borderRadius: {
-        '100px': '100px',
-        '200px': '200px',
+        'custom': '4px',
+        'custom-curve': '20px',
+        "100px": "100px", // Consistent use for rounded sections
+        "200px": "200px", // Larger rounded sections
+        "custom": "4px",
+        "full": "9999px", // Fully rounded corners if needed
       },
     },
   },

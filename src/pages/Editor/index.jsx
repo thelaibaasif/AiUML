@@ -1,95 +1,100 @@
-import React, { useState } from "react";
-import { FaBars } from "react-icons/fa";
+import React from "react";
+import { Link } from "react-router-dom";
 import logo from "../../images/logo.png";
-import diagramImage from "../../images/diagram.png"; // Replace with your actual diagram image path.
 
-const EnhancedEditor = () => {
-  const [inputText, setInputText] = useState("");
-
-  const handleInputChange = (e) => {
-    setInputText(e.target.value);
-  };
-
-  const handleSubmit = () => {
-    alert("Submitted: " + inputText);
-  };
-
+const EditorPage = () => {
   return (
-    <div className="bg-gray-50 min-h-screen flex flex-col">
-      {/* Top Bar */}
-      <header className="flex items-center justify-between bg-gray-300 p-4 shadow-md">
-        <div className="flex items-center space-x-4">
-          <FaBars className="text-xl text-gray-700" />
-          <h1 className="text-lg font-bold text-gray-700">AI chatbot System</h1>
-        </div>
-        <img src={logo} alt="AiUML Logo" className="w-16" />
-        <div className="flex space-x-2">
-          <button className="px-4 py-1 bg-red-700 text-white rounded-md hover:bg-gray-400">
-            Colors
-          </button>
-          <button className="px-4 py-1 bg-gray-500 text-white rounded-md hover:bg-gray-600">
-            Customize
-          </button>
-          <button className="px-4 py-1 bg-gray-700 text-white rounded-md hover:bg-gray-800">
-            Diagram
-          </button>
-          <button className="px-4 py-1 bg-gray-900 text-white rounded-md hover:bg-black">
-            Export
-          </button>
-          <button className="px-4 py-1 bg-red-700 text-white rounded-md hover:bg-gray-400">
-            Save
-          </button>
+    <div className="bg-gray-100 min-h-screen flex flex-col">
+      {/* Header Section */}
+      <header className="bg-gray-200 shadow-md">
+        <div className="container mx-auto flex justify-between items-center py-4 px-6">
+          {/* Logo */}
+          <div className="flex items-center space-x-3">
+            <img src={logo} alt="AiUML Logo" className="w-10 h-10" />
+            <h1 className="text-xl font-bold text-red-700">AiUML</h1>
+          </div>
+
+          {/* Action Buttons */}
+          <div className="flex space-x-4">
+            <button className="bg-red-700 text-white px-4 py-2 rounded-full hover:bg-red-800">
+              Colors
+            </button>
+            <button className="bg-red-700 text-white px-4 py-2 rounded-full hover:bg-red-800">
+              Customize
+            </button>
+            <button className="bg-red-700 text-white px-4 py-2 rounded-full hover:bg-red-800">
+              Diagram
+            </button>
+            <button className="bg-red-700 text-white px-4 py-2 rounded-full hover:bg-red-800">
+              Export
+            </button>
+            <button className="bg-red-700 text-white px-4 py-2 rounded-full hover:bg-red-800">
+              Save
+            </button>
+          </div>
         </div>
       </header>
 
-      {/* Main Section */}
-      <div className="flex flex-1">
-        {/* Left Sidebar */}
-        <aside className="w-1/3 bg-gray-200 p-4">
-          <h2 className="font-bold text-gray-700 mb-4">Draw a class diagram</h2>
-          <div className="bg-gray-300 p-3 rounded-md text-sm text-gray-700">
-            Draw a class diagram of a room in which there is a drawable, furniture (e.g., a couch),
-            and some windows and walls around the room.
+      {/* Main Content */}
+      <main className="flex flex-1">
+        {/* Left Panel */}
+        <div className="w-1/3 bg-gray-200 p-6 flex flex-col">
+          <h2 className="text-lg font-bold mb-4">AI Chatbot System</h2>
+          {/* Menu Tabs */}
+          <div className="flex space-x-2 mb-6">
+            <button className="bg-red-700 text-white px-4 py-2 rounded-full">
+              All
+            </button>
+            <button className="bg-gray-700 text-white px-4 py-2 rounded-full">
+              History
+            </button>
+            <button className="bg-gray-700 text-white px-4 py-2 rounded-full">
+              +New
+            </button>
+            <button className="bg-gray-700 text-white px-4 py-2 rounded-full">
+              Chat
+            </button>
+            <button className="bg-gray-700 text-white px-4 py-2 rounded-full">
+              Code
+            </button>
           </div>
-        </aside>
-
-        {/* Diagram Section */}
-        <div className="flex-1 bg-white flex flex-col items-center justify-center p-6">
-          <h2 className="text-xl font-bold text-gray-700 mb-4">Class Diagram</h2>
-          <img
-            src={diagramImage}
-            alt="Class Diagram"
-            className="w-3/4 h-auto border border-gray-300 shadow-md"
-          />
-          <button className="px-4 py-2 bg-gray-600 text-white rounded-md mt-4 hover:bg-gray-700">
-            + Reset
-          </button>
-        </div>
-      </div>
-
-      {/* Footer Section */}
-      <footer className="bg-gray-200 p-4 flex items-center justify-between">
-        <div className="flex items-center space-x-2 w-2/3">
-          <input
-            type="text"
-            placeholder="Type here ..."
-            value={inputText}
-            onChange={handleInputChange}
-            className="w-full px-4 py-2 border border-gray-400 rounded-md"
-          />
-          <button
-            onClick={handleSubmit}
-            className="bg-red-700 text-white px-4 py-2 rounded-md hover:bg-gray-400"
-          >
+          {/* Chat Input */}
+          <textarea
+            placeholder="Draw a class diagram of a room in which there is a drawable, furniture (e.g., couch), and some windows and walls around the room."
+            className="w-full h-32 p-4 border border-gray-300 rounded-md mb-4"
+          ></textarea>
+          <button className="bg-red-700 text-white w-full py-2 rounded-md hover:bg-red-800">
             Submit
           </button>
         </div>
-        <div className="text-sm text-gray-700 text-right">
-          Edit with AI. For example: Add a database to this diagram.
+
+        {/* Diagram Panel */}
+        <div className="w-2/3 bg-white p-6 flex flex-col">
+          <div className="flex justify-between items-center mb-4">
+            <h2 className="text-lg font-bold">Class Diagram</h2>
+            <button className="bg-gray-700 text-white px-4 py-2 rounded-full">
+              +Reset
+            </button>
+          </div>
+          <div className="bg-gray-50 border border-gray-300 rounded-md flex-1 p-6 flex items-center justify-center">
+            <img
+              src={logo}
+              alt="Diagram Placeholder"
+              className="w-48 h-48 opacity-50"
+            />
+          </div>
         </div>
+      </main>
+
+      {/* Footer */}
+      <footer className="bg-gray-200 text-center py-4">
+        <p className="text-sm text-gray-600">
+          Powered by AiUML | Enhance your system designs with automated
+          diagrams.
+        </p>
       </footer>
     </div>
   );
 };
 
-export default EnhancedEditor;
+export default EditorPage;

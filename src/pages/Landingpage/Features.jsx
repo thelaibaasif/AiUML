@@ -2,15 +2,11 @@ import React from "react";
 import feature1 from "../../images/feature1.jpeg";
 import feature2 from "../../images/feature2.png";
 import feature3 from "../../images/feature3.png";
-//import feature4 from "../../images/feature44.png";
 import feature4 from "../../images/feature444.png";
 import feature5 from "../../images/feature5.png";
 import feature6 from "../../images/feature66.png";
-//import feature6 from "../../images/feature666.png";
-//import feature6 from "../../images/feature6666.png";
 import feature7 from "../../images/feature7.png";
 import feature8 from "../../images/feature8.png";
-
 
 const features = [
   {
@@ -18,48 +14,56 @@ const features = [
     title: "Text analysis, entity extraction, relationship mapping",
     image: feature1,
     bgClass: "",
+    curveClass: "",
   },
   {
     id: "02",
     title: "From text, software requirements, and simple prompts using GenerativeAI",
     image: feature2,
     bgClass: "bg-light-blue",
+    curveClass: "rounded-bl-200px rounded-tl-200px",
   },
   {
     id: "03",
     title: "Pattern recognition, optimization, and modeling complex relationships",
     image: feature3,
     bgClass: "",
+    curveClass: "",
   },
   {
     id: "04",
     title: "Can take software descriptions and requirements as well",
     image: feature4,
     bgClass: "bg-light-blue",
+    curveClass: "rounded-br-200px rounded-tr-200px",
   },
   {
     id: "05",
     title: "Interactive editor, code editing, text commands, customization options",
     image: feature5,
     bgClass: "",
+    curveClass: "",
   },
   {
     id: "06",
     title: "Class, usecase, sequence, ERD diagrams",
     image: feature6,
     bgClass: "bg-light-blue",
+    curveClass: "rounded-bl-200px rounded-tl-200px",
   },
   {
     id: "07",
     title: "Export in SVG, PNG, and more",
     image: feature7,
     bgClass: "",
+    curveClass: "",
   },
   {
     id: "08",
     title: "Stores previous chats, diagrams, and their codes",
     image: feature8,
     bgClass: "bg-light-blue",
+    curveClass: "rounded-br-200px rounded-tr-200px",
   },
 ];
 
@@ -72,11 +76,9 @@ const Features = () => {
       {features.map((feature, index) => (
         <div
           key={feature.id}
-          className={`${
-            feature.bgClass
-          } w-full py-12 ${index % 2 === 0 ? "flex-row" : "flex-row-reverse"} ${
-            feature.bgClass ? "px-0" : "px-8"
-          } flex items-center`}
+          className={`flex items-center w-full py-12 ${
+            index % 2 === 0 ? "flex-row" : "flex-row-reverse"
+          } ${feature.bgClass} ${feature.curveClass} px-8`}
         >
           <div className="w-1/2 p-8">
             <img
