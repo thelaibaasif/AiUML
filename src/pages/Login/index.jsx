@@ -1,5 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { signInWithEmailAndPassword } from "firebase/auth";
+import { auth } from "../../firebase";  // Use '../../' to go up two levels from 'pages' folder
 import backgroundImage from "../../images/Login.png";
 import googleIcon from "../../images/google.png";
 import appleIcon from "../../images/apple.jpg";
@@ -34,7 +36,7 @@ const Login = () => {
     );
   };
 
-  const handleInputChange = (e) => {
+  const handleInputChange = async (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
 
@@ -57,13 +59,21 @@ const Login = () => {
       default:
         break;
     }
+
+    try {
+      await signInWithEmailAndPassword(auth, formData.email, formData.password);
+      alert("Login successful!");
+    } catch (err) {
+      setErrors(err.message);
+    }
+    
   };
 
   const handleLogin = (e) => {
     e.preventDefault();
     if (validateEmail(formData.email) && validatePassword(formData.password)) {
       alert("Login successful!");
-      navigate("/EnhanceEditor");
+      navigate("/EnhancedEditor");
     } else {
       alert("Please fix the errors before submitting.");
     }
@@ -81,7 +91,7 @@ const Login = () => {
   const handleModalAgree = () => {
     if (isAgreed) {
       alert("Sign-in successful!");
-      navigate("/EnhanceEditor");
+      navigate("/EnhancedEditor");
       setShowModal(false);
     } else {
       alert("You must agree to the terms and conditions to continue.");
