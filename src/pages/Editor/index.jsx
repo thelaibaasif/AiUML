@@ -1,8 +1,11 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import logo from "../../images/logo.png";
-import sampleDiagram from "../../images/classdiagram.jpeg";
-import sampleCodeImage from "../../images/plantuml_code.png"; // Add your code image
+import classDiagram from "../../images/classdiagram.jpeg";
+import useCaseDiagram from "../../images/usecasediagram.png"; // Use Case Diagram
+import erdDiagram from "../../images/erddiagram.png"; // ERD Diagram
+import sequenceDiagram from "../../images/sequencediagram.png"; // Sequence Diagram
+import sampleCodeImage from "../../images/plantuml_code.png"; // Code Image
 
 const EditorPage = () => {
   const [showSaveModal, setShowSaveModal] = useState(false);
@@ -10,8 +13,17 @@ const EditorPage = () => {
   const [showCustomizeDropdown, setShowCustomizeDropdown] = useState(false);
   const [showColorsDropdown, setShowColorsDropdown] = useState(false);
   const [activeTab, setActiveTab] = useState("Chat");
+  const [activeDiagram, setActiveDiagram] = useState({
+    name: "Class Diagram", // Default Diagram Name
+    image: classDiagram, // Default Diagram Image
+  });
+  const [zoomLevel, setZoomLevel] = useState(1); // Zoom level for diagrams
 
   const navigate = useNavigate();
+
+  const handleZoomIn = () => setZoomLevel((prev) => Math.min(prev + 0.1, 2)); // Max 200%
+  const handleZoomOut = () => setZoomLevel((prev) => Math.max(prev - 0.1, 0.5)); // Min 50%
+  const handleResetZoom = () => setZoomLevel(1); // Reset to 100%
 
   return (
     <div className="bg-gray-100 min-h-screen flex flex-col">
@@ -117,7 +129,6 @@ const EditorPage = () => {
               </div>
             )}
 
-            {/* Customize Dropdown */}
             <button
               className="bg-red-700 text-white px-4 py-2 rounded-full hover:bg-red-800 relative"
               onClick={() => setShowCustomizeDropdown(!showCustomizeDropdown)}
@@ -141,7 +152,6 @@ const EditorPage = () => {
               </div>
             )}
 
-            {/* Diagram Dropdown */}
             <button
               className="bg-red-700 text-white px-4 py-2 rounded-full hover:bg-red-800 relative"
               onClick={() => setShowDiagramDropdown(!showDiagramDropdown)}
@@ -152,50 +162,109 @@ const EditorPage = () => {
               <div className="absolute mt-12 bg-white shadow-md rounded-md p-4">
                 <h3 className="font-bold mb-2">Select Diagram Type:</h3>
                 <ul>
-                  <li className="hover:bg-gray-100 px-2 py-1 cursor-pointer">
+                  <li
+                    className="hover:bg-gray-100 px-2 py-1 cursor-pointer"
+                    onClick={() => {
+                      setActiveDiagram({
+                        name: "Class Diagram",
+                        image: classDiagram,
+                      });
+                      setShowDiagramDropdown(false);
+                    }}
+                  >
                     Class Diagram
                   </li>
-                  <li className="hover:bg-gray-100 px-2 py-1 cursor-pointer">
+                  <li
+                    className="hover:bg-gray-100 px-2 py-1 cursor-pointer"
+                    onClick={() => {
+                      setActiveDiagram({
+                        name: "Use Case Diagram",
+                        image: useCaseDiagram,
+                      });
+                      setShowDiagramDropdown(false);
+                    }}
+                  >
                     Use Case Diagram
                   </li>
-                  <li className="hover:bg-gray-100 px-2 py-1 cursor-pointer">
+                  <li
+                    className="hover:bg-gray-100 px-2 py-1 cursor-pointer"
+                    onClick={() => {
+                      setActiveDiagram({
+                        name: "ERD",
+                        image: erdDiagram,
+                      });
+                      setShowDiagramDropdown(false);
+                    }}
+                  >
                     ERD
                   </li>
-                  <li className="hover:bg-gray-100 px-2 py-1 cursor-pointer">
+                  <li
+                    className="hover:bg-gray-100 px-2 py-1 cursor-pointer"
+                    onClick={() => {
+                      setActiveDiagram({
+                        name: "Sequence Diagram",
+                        image: sequenceDiagram,
+                      });
+                      setShowDiagramDropdown(false);
+                    }}
+                  >
                     Sequence Diagram
                   </li>
                 </ul>
               </div>
             )}
 
-            {/* Other Buttons */}
-            {["Export", "Save"].map((btn, index) => (
-              <button
-                key={index}
-                className="bg-red-700 text-white px-4 py-2 rounded-full hover:bg-red-800"
-                onClick={() => btn === "Save" && setShowSaveModal(true)}
-              >
-                {btn}
-              </button>
-            ))}
+            <button
+              className="bg-red-700 text-white px-4 py-2 rounded-full hover:bg-red-800"
+              onClick={() => setShowSaveModal(true)}
+            >
+              Save
+            </button>
+            <button className="bg-red-700 text-white px-4 py-2 rounded-full hover:bg-red-800">
+              Export
+            </button>
           </div>
 
           {/* Diagram Section */}
           <div className="border border-gray-300 rounded-md bg-gray-50 p-4">
-            <h2 className="text-lg font-bold text-center mb-4">Class Diagram</h2>
-            <div className="flex justify-center items-center">
+            <h2 className="text-lg font-bold text-center mb-4">
+              {activeDiagram.name}
+            </h2>
+            <div
+              className="flex justify-center items-center"
+              style={{
+                transform: `scale(${zoomLevel})`,
+                transformOrigin: "center",
+              }}
+            >
               <img
-                src={sampleDiagram}
-                alt="Sample Diagram"
+                src={activeDiagram.image}
+                alt={activeDiagram.name}
                 className="max-w-full h-auto"
               />
             </div>
           </div>
 
-          {/* Reset Button */}
-          <button className="absolute bottom-4 right-6 bg-gray-700 text-white px-4 py-2 rounded-md">
-            + Reset
-          </button>
+          <div className="absolute bottom-4 right-6 flex space-x-2">
+            <button
+              className="bg-gray-700 text-white px-4 py-2 rounded-md"
+              onClick={handleZoomIn}
+            >
+              +
+            </button>
+            <button
+              className="bg-gray-700 text-white px-4 py-2 rounded-md"
+              onClick={handleResetZoom}
+            >
+              Reset
+            </button>
+            <button
+              className="bg-gray-700 text-white px-4 py-2 rounded-md"
+              onClick={handleZoomOut}
+            >
+              -
+            </button>
+          </div>
         </main>
       </div>
 
