@@ -2,19 +2,21 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import logo from "../../images/logo.png";
 import sampleDiagram from "../../images/classdiagram.jpeg";
+import sampleCodeImage from "../../images/plantuml_code.png"; // Add your code image
 
 const EditorPage = () => {
   const [showSaveModal, setShowSaveModal] = useState(false);
   const [showDiagramDropdown, setShowDiagramDropdown] = useState(false);
   const [showCustomizeDropdown, setShowCustomizeDropdown] = useState(false);
   const [showColorsDropdown, setShowColorsDropdown] = useState(false);
+  const [activeTab, setActiveTab] = useState("Chat");
 
   const navigate = useNavigate();
 
   return (
     <div className="bg-gray-100 min-h-screen flex flex-col">
       {/* Top Gray Bar */}
-      <header className="bg-gray-300 flex items-center justify-between px-4 py-2 ">
+      <header className="bg-gray-300 flex items-center justify-between px-4 py-2">
         <button className="text-gray-600 hover:text-black text-2xl">
           &#9776;
         </button>
@@ -42,8 +44,9 @@ const EditorPage = () => {
               {["All", "History", "+New", "Chat", "Code"].map((tab, index) => (
                 <button
                   key={index}
+                  onClick={() => setActiveTab(tab)}
                   className={`px-4 py-2 rounded-md text-white font-semibold ${
-                    tab === "All" ? "bg-red-700" : "bg-gray-700"
+                    activeTab === tab ? "bg-red-700" : "bg-gray-700"
                   } hover:bg-gray-800`}
                 >
                   {tab}
@@ -51,17 +54,26 @@ const EditorPage = () => {
               ))}
             </div>
 
-            {/* Chatbox */}
+            {/* Chatbox or Code Section */}
             <div className="bg-gray-400 text-white p-4 rounded-md mb-4 shadow">
-              Draw a class diagram of a room in which there is a drawable,
-              furniture (e.g., couch), and some windows and walls around the
-              room
+              {activeTab === "Chat" ? (
+                <>
+                  Draw a class diagram of a room in which there is a drawable,
+                  furniture (e.g., couch), and some windows and walls around the
+                  room
+                </>
+              ) : activeTab === "Code" ? (
+                <img
+                  src={sampleCodeImage}
+                  alt="Sample Code"
+                  className="max-w-full h-auto"
+                />
+              ) : null}
             </div>
           </div>
 
           {/* Bottom Section */}
           <div>
-            {/* Input */}
             <div className="flex items-center space-x-2 mb-4">
               <input
                 type="text"
@@ -72,10 +84,15 @@ const EditorPage = () => {
                 &#9654;
               </button>
             </div>
-
-            <button className="w-full bg-red-700 text-white py-2 rounded-md hover:bg-red-800">
-              Submit
-            </button>
+            {activeTab === "Chat" ? (
+              <button className="w-40 bg-red-700 text-white py-2 rounded-md hover:bg-red-800">
+                Submit
+              </button>
+            ) : activeTab === "Code" ? (
+              <button className="w-40 bg-blue-700 text-white py-2 rounded-md hover:bg-blue-800">
+                Edit
+              </button>
+            ) : null}
           </div>
         </aside>
 
@@ -83,7 +100,6 @@ const EditorPage = () => {
         <main className="flex-1 bg-white px-6 py-6 relative">
           {/* Buttons above Diagram */}
           <div className="flex space-x-4 mb-6 relative">
-            {/* Colors Dropdown */}
             <button
               className="bg-red-700 text-white px-4 py-2 rounded-full hover:bg-red-800 relative"
               onClick={() => setShowColorsDropdown(!showColorsDropdown)}
