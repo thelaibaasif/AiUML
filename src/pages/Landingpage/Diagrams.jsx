@@ -1,5 +1,5 @@
 import React from "react";
-import diagramImage from "../../images/Diagram.png"; // Replace with your image path
+import diagramImage from "../../images/diagram.png"; // Replace with your image path
 
 const Diagrams = () => {
   return (
