@@ -27,9 +27,9 @@ const Header = () => {
             <a href="#about" className="text-gray-600 hover:text-red-700">
               About us
             </a>
-            <a href="#features" className="text-gray-600 hover:text-red-700">
+            <Link to="/Features" className="text-gray-600 hover:text-red-700">
               Features
-            </a>
+            </Link>
             <a href="#contact" className="text-gray-600 hover:text-red-700">
               Contact
             </a>
@@ -64,9 +64,12 @@ const Header = () => {
               tool that automatically generates precise UML diagrams from textual
               requirements, enhancing accuracy and efficiency in system design.
             </p>
-            <button className="bg-red-700 text-white px-8 py-3 rounded-full font-semibold hover:bg-red-800 text-lg">
+            <Link
+              to="/EnhancedEditor"
+              className="bg-red-700 text-white px-8 py-3 rounded-full font-semibold hover:bg-red-800 text-lg"
+            >
               Get Started <span className="ml-2">➡</span>
-            </button>
+            </Link>
           </div>
 
           {/* Illustration */}

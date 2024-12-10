@@ -1,97 +1,109 @@
 import React from "react";
-import { Link } from "react-router-dom";
 import logo from "../../images/logo.png";
+import sampleDiagram from "../../images/classdiagram.jpeg";
 
 const EditorPage = () => {
   return (
     <div className="bg-gray-100 min-h-screen flex flex-col">
-      {/* Header Section */}
-      <header className="bg-gray-200 shadow-md">
-        <div className="container mx-auto flex justify-between items-center py-4 px-6">
-          {/* Logo */}
-          <div className="flex items-center space-x-3">
-            <img src={logo} alt="AiUML Logo" className="w-10 h-10" />
-            <h1 className="text-xl font-bold text-red-700">AiUML</h1>
-          </div>
-
-          {/* Action Buttons */}
-          <div className="flex space-x-4">
-            <button className="bg-red-700 text-white px-4 py-2 rounded-full hover:bg-red-800">
-              Colors
-            </button>
-            <button className="bg-red-700 text-white px-4 py-2 rounded-full hover:bg-red-800">
-              Customize
-            </button>
-            <button className="bg-red-700 text-white px-4 py-2 rounded-full hover:bg-red-800">
-              Diagram
-            </button>
-            <button className="bg-red-700 text-white px-4 py-2 rounded-full hover:bg-red-800">
-              Export
-            </button>
-            <button className="bg-red-700 text-white px-4 py-2 rounded-full hover:bg-red-800">
-              Save
-            </button>
-          </div>
-        </div>
+      {/* Top Gray Bar */}
+      <header className="bg-gray-300 flex items-center justify-between px-4 py-2">
+        <button className="text-gray-600 hover:text-black text-2xl">
+          &#9776;
+        </button>
+        <h1 className="text-2xl font-bold text-red-700 flex items-center">
+          <img src={logo} alt="AiUML Logo" className="w-20 h-20 mr-2" />
+          
+        </h1>
       </header>
 
-      {/* Main Content */}
-      <main className="flex flex-1">
+      <div className="flex flex-1">
         {/* Left Panel */}
-        <div className="w-1/3 bg-gray-200 p-6 flex flex-col">
-          <h2 className="text-lg font-bold mb-4">AI Chatbot System</h2>
-          {/* Menu Tabs */}
-          <div className="flex space-x-2 mb-6">
-            <button className="bg-red-700 text-white px-4 py-2 rounded-full">
-              All
-            </button>
-            <button className="bg-gray-700 text-white px-4 py-2 rounded-full">
-              History
-            </button>
-            <button className="bg-gray-700 text-white px-4 py-2 rounded-full">
-              +New
-            </button>
-            <button className="bg-gray-700 text-white px-4 py-2 rounded-full">
-              Chat
-            </button>
-            <button className="bg-gray-700 text-white px-4 py-2 rounded-full">
-              Code
-            </button>
-          </div>
-          {/* Chat Input */}
-          <textarea
-            placeholder="Draw a class diagram of a room in which there is a drawable, furniture (e.g., couch), and some windows and walls around the room."
-            className="w-full h-32 p-4 border border-gray-300 rounded-md mb-4"
-          ></textarea>
-          <button className="bg-red-700 text-white w-full py-2 rounded-md hover:bg-red-800">
-            Submit
-          </button>
-        </div>
+        <aside className="bg-gray-200 w-1/4 px-4 py-6 flex flex-col justify-between">
+          <div>
+            <h2 className="text-lg font-bold text-black mb-6">
+              AI Chatbot System
+            </h2>
 
-        {/* Diagram Panel */}
-        <div className="w-2/3 bg-white p-6 flex flex-col">
-          <div className="flex justify-between items-center mb-4">
-            <h2 className="text-lg font-bold">Class Diagram</h2>
-            <button className="bg-gray-700 text-white px-4 py-2 rounded-full">
-              +Reset
+            {/* Tabs */}
+            <div className="flex space-x-2 mb-6">
+              {["All", "History", "+New", "Chat", "Code"].map((tab, index) => (
+                <button
+                  key={index}
+                  className={`px-4 py-2 rounded-md text-white font-semibold ${
+                    tab === "All" ? "bg-red-700" : "bg-gray-700"
+                  } hover:bg-gray-800`}
+                >
+                  {tab}
+                </button>
+              ))}
+            </div>
+
+            {/* Chatbox */}
+            <div className="bg-gray-400 text-white p-4 rounded-md mb-4 shadow">
+              Draw a class diagram of a room in which there is a drawable,
+              furniture (e.g., couch), and some windows and walls around the
+              room
+            </div>
+          </div>
+
+          {/* Bottom Section */}
+          <div>
+            {/* Input */}
+            <div className="flex items-center space-x-2 mb-4">
+              <input
+                type="text"
+                placeholder="Type here..."
+                className="flex-1 px-3 py-2 border border-gray-400 rounded-md focus:outline-none"
+              />
+              <button className="bg-gray-500 text-white px-3 py-2 rounded-md">
+                &#9654;
+              </button>
+            </div>
+
+            <button className="w-full bg-red-700 text-white py-2 rounded-md hover:bg-red-800">
+              Submit
             </button>
           </div>
-          <div className="bg-gray-50 border border-gray-300 rounded-md flex-1 p-6 flex items-center justify-center">
-            <img
-              src={logo}
-              alt="Diagram Placeholder"
-              className="w-48 h-48 opacity-50"
-            />
+        </aside>
+
+        {/* Main Content */}
+        <main className="flex-1 bg-white px-6 py-6 relative">
+          {/* Buttons above Diagram */}
+          <div className="flex space-x-4 mb-6">
+            {["Colors", "Customize", "Diagram", "Export", "Save"].map(
+              (btn, index) => (
+                <button
+                  key={index}
+                  className="bg-red-700 text-white px-4 py-2 rounded-full hover:bg-red-800"
+                >
+                  {btn}
+                </button>
+              )
+            )}
           </div>
-        </div>
-      </main>
+
+          {/* Diagram Section */}
+          <div className="border border-gray-300 rounded-md bg-gray-50 p-4">
+            <h2 className="text-lg font-bold text-center mb-4">Class Diagram</h2>
+            <div className="flex justify-center items-center">
+              <img
+                src={sampleDiagram}
+                alt="Sample Diagram"
+                className="max-w-full h-auto"
+              />
+            </div>
+          </div>
+
+          {/* Reset Button */}
+          <button className="absolute bottom-4 right-6 bg-gray-700 text-white px-4 py-2 rounded-md">
+            + Reset
+          </button>
+        </main>
+      </div>
 
       {/* Footer */}
-      <footer className="bg-gray-200 text-center py-4">
-        <p className="text-sm text-gray-600">
-          Powered by AiUML | Enhance your system designs with automated
-          diagrams.
-        </p>
+      <footer className="bg-gray-200 text-center py-4 text-sm text-gray-600">
+        Powered by AiUML | Enhance your system designs with automated diagrams.
       </footer>
     </div>
   );
