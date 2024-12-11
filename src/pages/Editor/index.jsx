@@ -7,6 +7,8 @@ import erdDiagram from "../../images/erddiagram.png"; // ERD Diagram
 import sequenceDiagram from "../../images/sequencediagram.png"; // Sequence Diagram
 import sampleCodeImage from "../../images/plantuml_code.png"; // Code Image
 
+
+
 const EditorPage = () => {
   const [showSaveModal, setShowSaveModal] = useState(false);
   const [showDiagramDropdown, setShowDiagramDropdown] = useState(false);
@@ -17,6 +19,10 @@ const EditorPage = () => {
     name: "Class Diagram", // Default Diagram Name
     image: classDiagram, // Default Diagram Image
   });
+
+  const [inputText, setInputText] = useState("");
+  const [output, setOutput] = useState("");
+
   const [zoomLevel, setZoomLevel] = useState(1); // Zoom level for diagrams
 
   const navigate = useNavigate();
@@ -24,6 +30,31 @@ const EditorPage = () => {
   const handleZoomIn = () => setZoomLevel((prev) => Math.min(prev + 0.1, 2)); // Max 200%
   const handleZoomOut = () => setZoomLevel((prev) => Math.max(prev - 0.1, 0.5)); // Min 50%
   const handleResetZoom = () => setZoomLevel(1); // Reset to 100%
+
+   // Function to handle submission
+   const handleSubmit = async () => {
+    if (!inputText.trim()) return; // Avoid empty submissions
+    try {
+      const response = await fetch("http://localhost:8000/process", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ text: inputText }),
+      });
+      const data = await response.json();
+      console.log("Full Response:", JSON.stringify(data));
+      setOutput(data.generated_code);
+      setActiveDiagram((prev) => ({
+        ...prev,
+        image: data.diagram_url,
+        name: "Generated Diagram", 
+      }));
+    } catch (error) {
+      console.error("Error processing the text:", error);
+      setOutput("An error occurred. Please try again.");
+    }
+  };
 
   return (
     <div className="bg-gray-100 min-h-screen flex flex-col">
@@ -70,16 +101,12 @@ const EditorPage = () => {
             <div className="bg-gray-400 text-white p-4 rounded-md mb-4 shadow">
               {activeTab === "Chat" ? (
                 <>
-                  Draw a class diagram of a room in which there is a drawable,
-                  furniture (e.g., couch), and some windows and walls around the
-                  room
+                  <p>{inputText}</p>
                 </>
               ) : activeTab === "Code" ? (
-                <img
-                  src={sampleCodeImage}
-                  alt="Sample Code"
-                  className="max-w-full h-auto"
-                />
+                <>
+                  <p>{output}</p>
+                </>
               ) : null}
             </div>
           </div>
@@ -90,6 +117,8 @@ const EditorPage = () => {
               <input
                 type="text"
                 placeholder="Type here..."
+                value={inputText}
+                onChange={(e) => setInputText(e.target.value)}
                 className="w-4/5 px-3 py-3 text-lg border border-gray-400 rounded-md focus:outline-none"
               />
               <button className="bg-gray-500 text-white px-3 py-3 rounded-md">
@@ -97,7 +126,9 @@ const EditorPage = () => {
               </button>
             </div>
             {activeTab === "Chat" ? (
-              <button className="w-40 bg-red-700 text-white py-2 rounded-md hover:bg-red-800">
+              <button 
+              onClick={handleSubmit}
+              className="w-40 bg-red-700 text-white py-2 rounded-md hover:bg-red-800">
                 Submit
               </button>
             ) : activeTab === "Code" ? (
