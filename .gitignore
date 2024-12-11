@@ -21,3 +21,27 @@
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+
+#Virtual environment and its downloads
+venv/
+backend/venv/
+
+# Ignore large files
+*.dll
+*.lib
+
+
+# Ignore environment files
+.env
+
+# Ignore compiled files
+*.pyc
+*.pyo
+__pycache__/
+
+# Ignore log files
+*.log
+
+# Ignore system files
+.DS_Store
+Thumbs.db
