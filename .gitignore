@@ -23,8 +23,8 @@ yarn-debug.log*
 yarn-error.log*
 
 #Virtual environment and its downloads
-venv/
-backend/venv/
+.venv/
+/backend/venv/
 
 # Ignore large files
 *.dll
