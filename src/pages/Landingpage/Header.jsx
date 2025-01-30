@@ -14,9 +14,9 @@ const Header = () => {
             <img
               src={logo}
               alt="AiUML Logo"
-              className="w-14 h-14"
+              className="w-20 h-20"
             />
-            <h1 className="text-2xl font-bold text-red-700">AiUML</h1>
+            <h1 className="text-2xl font-bold text-red-700"></h1>
           </div>
 
           {/* Navigation */}
@@ -52,7 +52,7 @@ const Header = () => {
       <section id="home" className="relative">
         <div className="container mx-auto px-6 py-12 lg:py-20 flex flex-col lg:flex-row items-center max-w-7xl">
           {/* Text Content */}
-          <div className="lg:w-1/2">
+          <div className="lg:w-1/2 h-30">
             <h1 className="text-5xl font-bold text-red-700 mb-4">
               AI Powered
             </h1>
