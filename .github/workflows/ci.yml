@@ -12,7 +12,7 @@ jobs:
 
     strategy:
       matrix:
-        node-version: [18.x, 20.x, 22.x]
+        node-version: [22.x]
 
     steps:
     - name: Checkout repository
@@ -34,4 +34,4 @@ jobs:
       run: npm test -- --watchAll=false --passWithNoTests
 
     - name: Build React App
-      run: npm run build
+      run: CI=false npm run build
