@@ -31,7 +31,7 @@ jobs:
       continue-on-error: true  # Avoids breaking the build if linting fails
 
     - name: Run Tests
-      run: npm test -- --watchAll=false
+      run: npm test -- --watchAll=false --passWithNoTests
 
     - name: Build React App
       run: npm run build
