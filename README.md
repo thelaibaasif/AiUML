@@ -1,6 +1,6 @@
 # AiUML - React App
 
-[![React CI](https://github.com/Vaneeza-7/AiUML/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/Vaneeza-7/AiUML/actions/workflows/ci.yml)
+[![React CI](https://github.com/thelaibaasif/AiUML/actions/workflows/ci.yml/badge.svg)](https://github.com/thelaibaasif/AiUML/actions/workflows/ci.yml)
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
