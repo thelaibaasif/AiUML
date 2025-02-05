@@ -1,6 +1,41 @@
-# Getting Started with Create React App
+# AiUML - React App
+
+[![React CI](https://github.com/Vaneeza-7/AiUML/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/Vaneeza-7/AiUML/actions/workflows/ci.yml)
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+
+## Instructions
+
+First clone repo or pull changes and then do the following:
+
+```
+cd backend
+```
+
+```
+python -m venv venv
+```
+
+```
+venv\Scripts\activate
+```
+
+(if you get execution policy error do this)
+
+```
+Set-ExecutionPolicy Unrestricted -Scope Process
+```
+
+(and then try activate again)
+
+```
+pip install -r requirements.txt
+```
+
+After this, To start the FastAPI server and run the model locally, do the following:
+```
+uvicorn main:app --reload --host 0.0.0.0 --port 8000
+```
 
 ## Available Scripts
 
