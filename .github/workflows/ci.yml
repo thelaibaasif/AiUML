@@ -28,7 +28,7 @@ jobs:
 
     - name: Run Linting
       run: npm run lint
-      continue-on-error: true  # Avoids breaking the build if linting fails
+      continue-on-error: false
 
     - name: Run Tests
       run: npm test -- --watchAll=false --passWithNoTests
