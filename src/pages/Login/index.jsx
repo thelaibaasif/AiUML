@@ -59,21 +59,46 @@ const Login = () => {
       default:
         break;
     }
-
-    try {
-      await signInWithEmailAndPassword(auth, formData.email, formData.password);
-      alert("Login successful!");
-    } catch (err) {
-      setErrors(err.message);
-    }
     
   };
 
-  const handleLogin = (e) => {
+  const handleLogin = async(e) => {
     e.preventDefault();
+    console.log("Login button clicked");
     if (validateEmail(formData.email) && validatePassword(formData.password)) {
-      alert("Login successful!");
-      navigate("/EnhancedEditor");
+      try {
+        const userCredential = await signInWithEmailAndPassword(
+          auth,
+          formData.email,
+          formData.password
+        );
+        console.log("User logged in:", userCredential.user);
+        alert("Login successful!");
+        navigate("/EnhancedEditor");
+      } catch (err) {
+        console.error("Firebase Error Code:", err.code);
+      console.error("Firebase Error Message:", err.message);
+
+      switch (err.code) {
+        case "auth/user-not-found":
+          setErrors({ ...errors, email: "No user found with this email." });
+          break;
+        case "auth/wrong-password":
+          setErrors({ ...errors, password: "Incorrect password." });
+          break;
+        case "auth/invalid-email":
+          setErrors({ ...errors, email: "Invalid email format." });
+          break;
+        case "auth/too-many-requests":
+          alert("Too many login attempts. Please try again later.");
+          break;
+        default:
+          alert("Login failed. Please try again.");
+          break;
+        setErrors(err.message);
+      }
+    }
+      
     } else {
       alert("Please fix the errors before submitting.");
     }
