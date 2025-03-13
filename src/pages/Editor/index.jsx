@@ -2,10 +2,13 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import logo from "../../images/logo.png";
 import classDiagram from "../../images/classdiagram.jpeg";
-import useCaseDiagram from "../../images/usecasediagram.png"; // Use Case Diagram
-import erdDiagram from "../../images/erddiagram.png"; // ERD Diagram
-import sequenceDiagram from "../../images/sequencediagram.png"; // Sequence Diagram
-import sampleCodeImage from "../../images/plantuml_code.png"; // Code Image
+import useCaseDiagram from "../../images/usecasediagram.png";
+import erdDiagram from "../../images/erddiagram.png";
+import sequenceDiagram from "../../images/sequencediagram.png";
+import sampleCodeImage from "../../images/plantuml_code.png";
+import Loader from "../../components/Loader";
+import MenuButton from "../../components/MenuButton";
+//import TokenLimitedInput from "../../components/TokenLimitedInput";
 
 const EditorPage = () => {
   const [showSaveModal, setShowSaveModal] = useState(false);
@@ -14,27 +17,31 @@ const EditorPage = () => {
   const [showColorsDropdown, setShowColorsDropdown] = useState(false);
   const [activeTab, setActiveTab] = useState("Chat");
   const [activeDiagram, setActiveDiagram] = useState({
-    name: "Class Diagram", // Default Diagram Name
-    image: classDiagram, // Default Diagram Image
+    name: "Class Diagram",
+    image: classDiagram,
   });
-  const [zoomLevel, setZoomLevel] = useState(1); // Zoom level for diagrams
-
+  const [zoomLevel, setZoomLevel] = useState(1);
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
-  const handleZoomIn = () => setZoomLevel((prev) => Math.min(prev + 0.1, 2)); // Max 200%
-  const handleZoomOut = () => setZoomLevel((prev) => Math.max(prev - 0.1, 0.5)); // Min 50%
-  const handleResetZoom = () => setZoomLevel(1); // Reset to 100%
+  const handleZoomIn = () => setZoomLevel((prev) => Math.min(prev + 0.1, 2));
+  const handleZoomOut = () => setZoomLevel((prev) => Math.max(prev - 0.1, 0.5));
+  const handleResetZoom = () => setZoomLevel(1);
+
+  const handleChatSubmit = () => {
+    setIsLoading(true);
+    setTimeout(() => {
+      setIsLoading(false);
+    }, 2000);
+  };
 
   return (
-    <div className="bg-gray-100 min-h-screen flex flex-col">
-      {/* Top Gray Bar */}
+    <div className="bg-white min-h-screen flex flex-col">
       <header className="bg-gray-300 flex items-center justify-between px-4 py-2">
-        <button className="text-gray-600 hover:text-black text-2xl">
-          &#9776;
-        </button>
-        <h1 className="text-2xl font-bold text-red-700 flex items-center">
-          <img src={logo} alt="AiUML Logo" className="w-25 h-20 mr-2" />
-        </h1>
+        <MenuButton />
+        <div className="flex items-center">
+          <img src={logo} alt="AiUML Logo" className="w-34 h-auto mr-2" />
+        </div>
         <button
           className="bg-red-700 text-white px-4 py-2 rounded-md hover:bg-red-800"
           onClick={() => navigate("/")}
@@ -44,176 +51,158 @@ const EditorPage = () => {
       </header>
 
       <div className="flex flex-1">
-        {/* Left Panel */}
-        <aside className="bg-gray-200 w-1/3 px-4 py-6 flex flex-col justify-between">
+        <aside className="bg-gray-100 w-1/3 px-4 py-6 flex flex-col justify-between">
           <div>
-            <h2 className="text-lg font-bold text-black mb-6">
-              AI Chatbot System
-            </h2>
-
-            {/* Tabs */}
+            <h2 className="text-lg font-bold text-black mb-6">AI Chatbot System</h2>
             <div className="flex space-x-2 mb-6">
-              {["All", "History", "+New", "Chat", "Code"].map((tab, index) => (
+              {["All", "History", "+New chat", "Chat", "Code"].map((tab) => (
                 <button
-                  key={index}
+                  key={tab}
                   onClick={() => setActiveTab(tab)}
-                  className={`px-4 py-2 rounded-md text-white font-semibold ${
-                    activeTab === tab ? "bg-red-700" : "bg-gray-700"
+                  className={`px-4 py-2 rounded-md font-semibold text-white transition duration-150 ${
+                    activeTab === tab ? "bg-gray-700" : "bg-red-700"
                   } hover:bg-gray-800`}
                 >
                   {tab}
                 </button>
               ))}
             </div>
-
-            {/* Chatbox or Code Section */}
             <div className="bg-gray-400 text-white p-4 rounded-md mb-4 shadow">
-              {activeTab === "Chat" ? (
-                <>
-                  Draw a class diagram of a room in which there is a drawable,
-                  furniture (e.g., couch), and some windows and walls around the
-                  room
-                </>
-              ) : activeTab === "Code" ? (
-                <img
-                  src={sampleCodeImage}
-                  alt="Sample Code"
-                  className="max-w-full h-auto"
-                />
-              ) : null}
-            </div>
-          </div>
+  {activeTab === "Chat" ? (
+    <>
+      Draw a class diagram of a room in which there is a drawable,
+      furniture (e.g., couch), and some windows and walls around the
+      room
+    </>
+  ) : activeTab === "Code" ? (
+    <img
+      src={sampleCodeImage}
+      alt="Sample Code"
+      className="max-w-full h-auto"
+    />
+  ) : activeTab === "History" ? (
+    <div className="text-sm text-black">
+      <h3 className="text-xl font-bold text-red-700 mb-4">History</h3>
+      <table className="w-full text-left">
+        <thead>
+          <tr className="text-red-700 font-semibold">
+            <th className="pb-2">Title</th>
+            <th className="pb-2">Created</th>
+            <th className="pb-2">Restore</th>
+            <th className="pb-2">Delete</th>
+          </tr>
+        </thead>
+        <tbody className="text-gray-900">
+          {[
+            "UseCase Diagram @123",
+            "Class Diagram @123",
+            "Sequence Diagram @123",
+            "ERD Diagram @123",
+          ].map((title, index) => (
+            <tr key={index} className="border-t border-gray-200">
+              <td className="py-2">{title}</td>
+              <td className="py-2">1/2/21</td>
+              <td className="py-2">
+                <button className="bg-red-700 p-2 rounded-full">
+                  <span role="img" aria-label="restore">🔄</span>
+                </button>
+              </td>
+              <td className="py-2">
+                <button className="text-red-700 bg-red-700 p-2 rounded-full" >
+                  <span role="img" aria-label="delete">🗑️</span>
+                </button>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  ) : null}
+</div>
 
-          {/* Bottom Section */}
+          </div>
           <div>
             <div className="flex items-center space-x-2 mb-4">
               <input
                 type="text"
-                placeholder="Type here..."
-                className="w-4/5 px-3 py-3 text-lg border border-gray-400 rounded-md focus:outline-none"
+                placeholder="Type here...(0/3000)"
+                className="flex-grow px-4 py-2 rounded-md border border-gray-300"
               />
-              <button className="bg-gray-500 text-white px-3 py-3 rounded-md">
-                &#9654;
-              </button>
+              
             </div>
-            {activeTab === "Chat" ? (
-              <button className="w-40 bg-red-700 text-white py-2 rounded-md hover:bg-red-800">
-                Submit
-              </button>
-            ) : activeTab === "Code" ? (
-              <button className="w-40 bg-blue-700 text-white py-2 rounded-md hover:bg-blue-800">
-                Edit
-              </button>
-            ) : null}
+            <button
+              onClick={handleChatSubmit}
+              className={`w-full py-2 text-white rounded-md ${
+                activeTab === "Chat"
+                  ? "bg-red-700 hover:bg-red-800"
+                  : "bg-red-700 hover:bg-red-800"
+              }`}
+            >
+              {activeTab === "Chat" ? "Submit" : "Edit"} 
+              
+            </button>
           </div>
         </aside>
 
-        {/* Main Content */}
         <main className="flex-1 bg-white px-6 py-6 relative">
-          {/* Buttons above Diagram */}
           <div className="flex space-x-4 mb-6 relative">
-            <button
-              className="bg-red-700 text-white px-4 py-2 rounded-full hover:bg-red-800 relative"
-              onClick={() => setShowColorsDropdown(!showColorsDropdown)}
-            >
-              Colors
-            </button>
-            {showColorsDropdown && (
-              <div className="absolute mt-12 bg-white shadow-md rounded-md p-4">
-                <h3 className="font-bold mb-2">Select Color Scheme:</h3>
-                <div className="flex space-x-4">
-                  <div className="w-8 h-8 bg-red-700 rounded-full cursor-pointer"></div>
-                  <div className="w-8 h-8 bg-blue-700 rounded-full cursor-pointer"></div>
-                  <div className="w-8 h-8 bg-green-700 rounded-full cursor-pointer"></div>
-                </div>
+            {[{ label: "Colors", state: showColorsDropdown, setState: setShowColorsDropdown }, { label: "Customize", state: showCustomizeDropdown, setState: setShowCustomizeDropdown }, { label: "Diagram", state: showDiagramDropdown, setState: setShowDiagramDropdown }].map(({ label, state, setState }) => (
+              <div key={label} className="relative">
+                <button
+                  className="bg-red-700 text-white px-4 py-2 rounded-full hover:bg-red-800"
+                  onClick={() => setState(!state)}
+                >
+                  {label}
+                </button>
+                {label === "Colors" && state && (
+                  <div className="absolute mt-12 bg-white shadow-md rounded-md p-4 z-10">
+                    <h3 className="font-bold mb-2">Select Color Scheme:</h3>
+                    <div className="flex space-x-4">
+                      <div className="w-8 h-8 bg-red-700 rounded-full cursor-pointer"></div>
+                      <div className="w-8 h-8 bg-blue-700 rounded-full cursor-pointer"></div>
+                      <div className="w-8 h-8 bg-green-700 rounded-full cursor-pointer"></div>
+                    </div>
+                  </div>
+                )}
+                {label === "Customize" && state && (
+                  <div className="absolute mt-12 bg-white shadow-md rounded-md p-4 z-10">
+                    <h3 className="font-bold mb-2">Select Theme:</h3>
+                    <ul>
+                      <li className="hover:bg-gray-100 px-2 py-1 cursor-pointer">Light Theme</li>
+                      <li className="hover:bg-gray-100 px-2 py-1 cursor-pointer">Dark Theme</li>
+                      <li className="hover:bg-gray-100 px-2 py-1 cursor-pointer">High Contrast</li>
+                    </ul>
+                  </div>
+                )}
+                {label === "Diagram" && state && (
+                  <div className="absolute mt-12 bg-white shadow-md rounded-md p-4 z-10">
+                    <h3 className="font-bold mb-2">Select Diagram Type:</h3>
+                    <ul>
+                      {["Class Diagram", "Use Case Diagram", "ERD", "Sequence Diagram"].map((name) => (
+                        <li
+                          key={name}
+                          className="hover:bg-gray-100 px-2 py-1 cursor-pointer"
+                          onClick={() => {
+                            const image =
+                              name === "Class Diagram"
+                                ? classDiagram
+                                : name === "Use Case Diagram"
+                                ? useCaseDiagram
+                                : name === "ERD"
+                                ? erdDiagram
+                                : sequenceDiagram;
+                            setActiveDiagram({ name, image });
+                            setShowDiagramDropdown(false);
+                          }}
+                        >
+                          {name}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
               </div>
-            )}
-
-            <button
-              className="bg-red-700 text-white px-4 py-2 rounded-full hover:bg-red-800 relative"
-              onClick={() => setShowCustomizeDropdown(!showCustomizeDropdown)}
-            >
-              Customize
-            </button>
-            {showCustomizeDropdown && (
-              <div className="absolute mt-12 bg-white shadow-md rounded-md p-4">
-                <h3 className="font-bold mb-2">Select Theme:</h3>
-                <ul>
-                  <li className="hover:bg-gray-100 px-2 py-1 cursor-pointer">
-                    Light Theme
-                  </li>
-                  <li className="hover:bg-gray-100 px-2 py-1 cursor-pointer">
-                    Dark Theme
-                  </li>
-                  <li className="hover:bg-gray-100 px-2 py-1 cursor-pointer">
-                    High Contrast
-                  </li>
-                </ul>
-              </div>
-            )}
-
-            <button
-              className="bg-red-700 text-white px-4 py-2 rounded-full hover:bg-red-800 relative"
-              onClick={() => setShowDiagramDropdown(!showDiagramDropdown)}
-            >
-              Diagram
-            </button>
-            {showDiagramDropdown && (
-              <div className="absolute mt-12 bg-white shadow-md rounded-md p-4">
-                <h3 className="font-bold mb-2">Select Diagram Type:</h3>
-                <ul>
-                  <li
-                    className="hover:bg-gray-100 px-2 py-1 cursor-pointer"
-                    onClick={() => {
-                      setActiveDiagram({
-                        name: "Class Diagram",
-                        image: classDiagram,
-                      });
-                      setShowDiagramDropdown(false);
-                    }}
-                  >
-                    Class Diagram
-                  </li>
-                  <li
-                    className="hover:bg-gray-100 px-2 py-1 cursor-pointer"
-                    onClick={() => {
-                      setActiveDiagram({
-                        name: "Use Case Diagram",
-                        image: useCaseDiagram,
-                      });
-                      setShowDiagramDropdown(false);
-                    }}
-                  >
-                    Use Case Diagram
-                  </li>
-                  <li
-                    className="hover:bg-gray-100 px-2 py-1 cursor-pointer"
-                    onClick={() => {
-                      setActiveDiagram({
-                        name: "ERD",
-                        image: erdDiagram,
-                      });
-                      setShowDiagramDropdown(false);
-                    }}
-                  >
-                    ERD
-                  </li>
-                  <li
-                    className="hover:bg-gray-100 px-2 py-1 cursor-pointer"
-                    onClick={() => {
-                      setActiveDiagram({
-                        name: "Sequence Diagram",
-                        image: sequenceDiagram,
-                      });
-                      setShowDiagramDropdown(false);
-                    }}
-                  >
-                    Sequence Diagram
-                  </li>
-                </ul>
-              </div>
-            )}
-
+            ))}
             <button
               className="bg-red-700 text-white px-4 py-2 rounded-full hover:bg-red-800"
               onClick={() => setShowSaveModal(true)}
@@ -225,13 +214,19 @@ const EditorPage = () => {
             </button>
           </div>
 
-          {/* Diagram Section */}
-          <div className="border border-gray-300 rounded-md bg-gray-50 p-4">
+          <div className="border border-gray-300 rounded-md bg-white p-4 relative min-h-[400px]">
             <h2 className="text-lg font-bold text-center mb-4">
               {activeDiagram.name}
             </h2>
+            {isLoading && (
+              <div className="absolute inset-0 flex justify-center items-center z-50">
+                <Loader />
+              </div>
+            )}
             <div
-              className="flex justify-center items-center"
+              className={`flex justify-center items-center transition-opacity duration-300 ${
+                isLoading ? "opacity-0" : "opacity-100"
+              }`}
               style={{
                 transform: `scale(${zoomLevel})`,
                 transformOrigin: "center",
@@ -268,7 +263,6 @@ const EditorPage = () => {
         </main>
       </div>
 
-      {/* Save Modal */}
       {showSaveModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white rounded-md shadow-md p-6 w-1/3">
@@ -285,13 +279,7 @@ const EditorPage = () => {
                   <input type="radio" name="size" className="mr-2" /> Auto
                 </label>
                 <label>
-                  <input
-                    type="radio"
-                    name="size"
-                    className="mr-2"
-                    defaultChecked
-                  />{" "}
-                  Customize
+                  <input type="radio" name="size" className="mr-2" defaultChecked /> Customize
                 </label>
               </div>
               <div className="flex space-x-4 mt-4">
@@ -321,7 +309,6 @@ const EditorPage = () => {
         </div>
       )}
 
-      {/* Footer */}
       <footer className="bg-gray-200 text-center py-4 text-sm text-gray-600">
         Powered by AiUML | Enhance your system designs with automated diagrams.
       </footer>

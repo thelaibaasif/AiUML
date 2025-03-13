@@ -5,6 +5,7 @@ import Login from "./pages/Login/index.jsx";
 import Editor from "./pages/Editor/index.jsx";
 import LandingPage from "./pages/Landingpage/index.jsx";
 import Features from "./pages/Landingpage/Features.jsx";
+import Profile from "./components/Profile"; 
 
 function App() {
   return (
@@ -13,6 +14,7 @@ function App() {
       <Route path="/login" element={<Login />} />
       <Route path="/features" element={<Features />} />
       <Route path="/EnhancedEditor" element={<Editor />} />
+      <Route path="/profile" element={<Profile />} />
       <Route path="/" element={<LandingPage />} />
     </Routes>
   );

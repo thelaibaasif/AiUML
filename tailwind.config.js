@@ -1,5 +1,6 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
+  darkMode: 'class',
   content: [
     "./src/**/*.{js,jsx,ts,tsx}",
   ],
@@ -7,7 +8,7 @@ module.exports = {
     extend: {
       colors: {
         "light-blue": "#EAF6FE", // Updated light blue color for the background
-        "red-700": "#B91C1C",   // Correct red-700 color
+        "red-700": "#940B36",   // Correct red-700 color
         "gray-600": "#4B5563",  // Standard gray-600 for text
         "gray-800": "#1F2937",  // Standard gray-800 for text
         "pink-700": "#AF2658",  // Additional pink-red shade
