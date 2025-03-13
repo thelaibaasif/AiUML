@@ -34,12 +34,18 @@ const EditorPage = () => {
   const handleZoomOut = () => setZoomLevel((prev) => Math.max(prev - 0.1, 0.5));
   const handleResetZoom = () => setZoomLevel(1);
 
-  const handleChatSubmit = () => {
+  //handle chat submit and loading
+  const handleChatSubmit = async () => {
+    if (!inputText.trim()) return; // Prevent empty submissions
     setIsLoading(true);
-    setTimeout(() => {
+    try {
+      await handleSubmit();
+    } catch (error) {
+      console.error("Submission error:", error);
+    } finally {
       setIsLoading(false);
-    }, 2000);
-  };
+    }
+  };  
 
    // Function to handle submission
    const handleSubmit = async () => {
@@ -55,6 +61,7 @@ const EditorPage = () => {
       const data = await response.json();
       console.log("Full Response:", JSON.stringify(data));
       setOutput(data.generated_code);
+      //output = data.generated_code;
       setActiveDiagram((prev) => ({
         ...prev,
         image: data.diagram_url,
@@ -170,21 +177,20 @@ const EditorPage = () => {
               <input
                 type="text"
                 placeholder="Type here...(0/3000)"
+                value={inputText}
+                onChange={(e) => setInputText(e.target.value)}
                 className="flex-grow px-4 py-2 rounded-md border border-gray-300"
               />
               
             </div>
-            <button
-              onClick={handleChatSubmit}
-              className={`w-full py-2 text-white rounded-md ${
-                activeTab === "Chat"
-                  ? "bg-red-700 hover:bg-red-800"
-                  : "bg-red-700 hover:bg-red-800"
-              }`}
-            >
-              {activeTab === "Chat" ? "Submit" : "Edit"} 
-              
-            </button>
+          <button
+            onClick={handleChatSubmit}
+            disabled={isLoading}
+            className=
+            {`w-full py-2 text-white rounded-md ${isLoading ? "opacity-50 cursor-not-allowed" : "bg-red-700 hover:bg-red-800"}`}
+          >
+            {activeTab === "Chat" ? "Submit" : "Edit"}
+          </button>
           </div>
         </aside>
 
