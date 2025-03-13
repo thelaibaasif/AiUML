@@ -1,0 +1,145 @@
+.gitattributes
+.gitignore
+README.md
+backend/__pycache__/main.cpython-311.pyc
+backend/main.py
+firebase-auth
+package-lock.json
+package.json
+postcss.config.js
+public/favicon.ico
+public/images/82eb95040e7ee88b1598d6590126b7f6a0b11837-1440x850.webp
+public/index.html
+public/logo192.png
+public/logo512.png
+public/manifest.json
+public/robots.txt
+src/App.css
+src/App.js
+src/firebase.js
+src/images/09a00668bd7eb5cbfb0489436b933b3230410ca6-721x720.webp
+src/images/0b769bf52cbb5c74c920269e829e15bcc27b5e03-1440x1440.webp
+src/images/4421d5c5f6990b02354e437d14ae88309e11290a-1920x1920.webp
+src/images/45a62e86f4b3f4f2ddf3c5349667a55c0b65e007-1440x850.webp
+src/images/AI-removebg-preview.png
+src/images/AI.jpg
+src/images/AiUML (1).png
+src/images/AiUML (2) (1).png
+src/images/AiUML (2).png
+src/images/AiUML (3) (1).png
+src/images/AiUML (3).png
+src/images/AiUML (4) (1).png
+src/images/AiUML (4).png
+src/images/AiUML (5).png
+src/images/AiUML.mp4
+src/images/AiUML.png
+src/images/AiUML__1_-removebg-preview.png
+src/images/AiUML__2_-removebg-preview.png
+src/images/AiUML__3_-removebg-preview.png
+src/images/Illustration.png
+src/images/Login.png
+src/images/OIP (1).jpg
+src/images/OIP (2).jpg
+src/images/OIP.jpg
+src/images/Screenshot 2024-10-08 232156.png
+src/images/Untitled design.png
+src/images/WhatisAiuml-removebg-preview.png
+src/images/WhatisAiuml.png
+src/images/WhatsApp Image 2024-09-11 at 10.33.33 AM.jpeg
+src/images/WhatsApp Image 2024-09-11 at 7.26.46 AM (1).jpeg
+src/images/WhatsApp Image 2024-09-11 at 7.26.46 AM.jpeg
+src/images/WhatsApp Image 2024-09-11 at 7.26.47 AM (1).jpeg
+src/images/WhatsApp Image 2024-09-11 at 7.26.47 AM.jpeg
+src/images/WhatsApp Image 2024-09-11 at 7.26.48 AM (1).jpeg
+src/images/WhatsApp Image 2024-09-11 at 7.26.48 AM.jpeg
+src/images/WhatsApp Image 2024-09-11 at 7.26.49 AM (1).jpeg
+src/images/WhatsApp Image 2024-09-11 at 7.26.49 AM.jpeg
+src/images/WhatsApp Image 2024-09-11 at 7.26.50 AM (1).jpeg
+src/images/WhatsApp Image 2024-09-11 at 7.26.50 AM.jpeg
+src/images/WhatsApp Image 2024-09-11 at 7.40.20 AM.jpeg
+src/images/WhatsApp Image 2024-09-11 at 7.40.21 AM (1).jpeg
+src/images/WhatsApp Image 2024-09-11 at 7.40.22 AM (1).jpeg
+src/images/WhatsApp Image 2024-09-11 at 7.40.22 AM.jpeg
+src/images/WhatsApp Image 2024-09-11 at 7.40.23 AM (1).jpeg
+src/images/WhatsApp Image 2024-09-11 at 7.40.24 AM.jpeg
+src/images/WhatsApp Image 2024-10-09 at 3.24.43 PM.jpeg
+src/images/WhatsApp Image 2024-10-11 at 6.29.39 AM.jpeg
+src/images/WhatsApp_Image_2024-09-11_at_10.33.33_AM__1_-removebg-preview.png
+src/images/WhatsApp_Image_2024-09-11_at_10.33.33_AM__2_-removebg-preview.png
+src/images/WhatsApp_Image_2024-09-11_at_7.26.47_AM__1_-removebg-preview.png
+src/images/WhatsApp_Image_2024-09-11_at_7.40.21_AM-removebg-preview.png
+src/images/WhatsApp_Image_2024-09-11_at_7.40.22_AM-removebg-preview.png
+src/images/WhatsApp_Image_2024-09-11_at_7.40.24_AM-removebg-preview.png
+src/images/WhatsApp_Image_2024-09-11_at_7.40.24_AM__1_-removebg-preview.png
+src/images/apple.jpg
+src/images/arrow (1).png
+src/images/arrow (2).png
+src/images/arrow (3).png
+src/images/arrow.png
+src/images/automation.png
+src/images/brain-removebg-preview (1).png
+src/images/chris-lee-70l1tdai6rm-unsplash-1.png
+src/images/classdiagram.jpeg
+src/images/client.png
+src/images/customization.png
+src/images/d62b9bcac3f92aa6442af43d9a60818021abc52e-1440x850.webp
+src/images/diagram.png
+src/images/erddiagram.png
+src/images/error (1).png
+src/images/error.png
+src/images/feature1.jpeg
+src/images/feature2.png
+src/images/feature3.png
+src/images/feature4.png
+src/images/feature44.png
+src/images/feature444.png
+src/images/feature5.png
+src/images/feature6.png
+src/images/feature66.png
+src/images/feature666.png
+src/images/feature6666.png
+src/images/feature7.png
+src/images/feature8.png
+src/images/freepik-export-20241009162058PU64.png
+src/images/google.png
+src/images/google_13170545.png
+src/images/hand-drawn-mobile-application-icons-with-blank-paper-chalkboard.jpg
+src/images/have-an-account-sign-in.svg
+src/images/head-removebg-preview.png
+src/images/head.png
+src/images/header.webp
+src/images/icons8-apple-logo-1.svg
+src/images/icons8-google-1.svg
+src/images/keyboard.png
+src/images/line-2.svg
+src/images/logo.png
+src/images/message.png
+src/images/pexels-gabby-k-9433158.jpg
+src/images/plantuml_code.png
+src/images/robot.png
+src/images/sequencediagram.png
+src/images/social_12942327.png
+src/images/sync-removebg-preview.png
+src/images/sync.png
+src/images/trash.png
+src/images/umlDiagram1.jpeg
+src/images/umlDiagram2.jpeg
+src/images/usecasediagram.png
+src/images/view.png
+src/images/web-design-website-coding-concept.jpg
+src/images/zoom-out.png
+src/index.css
+src/index.js
+src/pages/Editor/index.jsx
+src/pages/Landingpage/Clients.jsx
+src/pages/Landingpage/ConnectWithUs.jsx
+src/pages/Landingpage/Diagrams.jsx
+src/pages/Landingpage/ElevateUML.jsx
+src/pages/Landingpage/Features.jsx
+src/pages/Landingpage/Footer.jsx
+src/pages/Landingpage/Header.jsx
+src/pages/Landingpage/WhatIsAiUML.jsx
+src/pages/Landingpage/index.jsx
+src/pages/Login/index.jsx
+src/pages/Signup/index.jsx
+tailwind.config.js

@@ -10,6 +10,8 @@ import Loader from "../../components/Loader";
 import MenuButton from "../../components/MenuButton";
 //import TokenLimitedInput from "../../components/TokenLimitedInput";
 
+
+
 const EditorPage = () => {
   const [showSaveModal, setShowSaveModal] = useState(false);
   const [showDiagramDropdown, setShowDiagramDropdown] = useState(false);
@@ -20,8 +22,17 @@ const EditorPage = () => {
     name: "Class Diagram",
     image: classDiagram,
   });
+<<<<<<< HEAD
   const [zoomLevel, setZoomLevel] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
+=======
+
+  const [inputText, setInputText] = useState("");
+  const [output, setOutput] = useState("");
+
+  const [zoomLevel, setZoomLevel] = useState(1); // Zoom level for diagrams
+
+>>>>>>> 6155a3b59a00098a49552fc037f8993fd73037d6
   const navigate = useNavigate();
 
   const handleZoomIn = () => setZoomLevel((prev) => Math.min(prev + 0.1, 2));
@@ -33,6 +44,31 @@ const EditorPage = () => {
     setTimeout(() => {
       setIsLoading(false);
     }, 2000);
+  };
+
+   // Function to handle submission
+   const handleSubmit = async () => {
+    if (!inputText.trim()) return; // Avoid empty submissions
+    try {
+      const response = await fetch("http://localhost:8000/process", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ text: inputText }),
+      });
+      const data = await response.json();
+      console.log("Full Response:", JSON.stringify(data));
+      setOutput(data.generated_code);
+      setActiveDiagram((prev) => ({
+        ...prev,
+        image: data.diagram_url,
+        name: "Generated Diagram", 
+      }));
+    } catch (error) {
+      console.error("Error processing the text:", error);
+      setOutput("An error occurred. Please try again.");
+    }
   };
 
   return (
@@ -68,6 +104,7 @@ const EditorPage = () => {
               ))}
             </div>
             <div className="bg-gray-400 text-white p-4 rounded-md mb-4 shadow">
+<<<<<<< HEAD
   {activeTab === "Chat" ? (
     <>
       Draw a class diagram of a room in which there is a drawable,
@@ -119,17 +156,38 @@ const EditorPage = () => {
     </div>
   ) : null}
 </div>
+=======
+              {activeTab === "Chat" ? (
+                <>
+                  <p>{inputText}</p>
+                </>
+              ) : activeTab === "Code" ? (
+                <>
+                  <p>{output}</p>
+                </>
+              ) : null}
+            </div>
+          </div>
+>>>>>>> 6155a3b59a00098a49552fc037f8993fd73037d6
 
           </div>
           <div>
             <div className="flex items-center space-x-2 mb-4">
               <input
                 type="text"
+<<<<<<< HEAD
                 placeholder="Type here...(0/3000)"
                 className="flex-grow px-4 py-2 rounded-md border border-gray-300"
+=======
+                placeholder="Type here..."
+                value={inputText}
+                onChange={(e) => setInputText(e.target.value)}
+                className="w-4/5 px-3 py-3 text-lg border border-gray-400 rounded-md focus:outline-none"
+>>>>>>> 6155a3b59a00098a49552fc037f8993fd73037d6
               />
               
             </div>
+<<<<<<< HEAD
             <button
               onClick={handleChatSubmit}
               className={`w-full py-2 text-white rounded-md ${
@@ -141,6 +199,19 @@ const EditorPage = () => {
               {activeTab === "Chat" ? "Submit" : "Edit"} 
               
             </button>
+=======
+            {activeTab === "Chat" ? (
+              <button 
+              onClick={handleSubmit}
+              className="w-40 bg-red-700 text-white py-2 rounded-md hover:bg-red-800">
+                Submit
+              </button>
+            ) : activeTab === "Code" ? (
+              <button className="w-40 bg-blue-700 text-white py-2 rounded-md hover:bg-blue-800">
+                Edit
+              </button>
+            ) : null}
+>>>>>>> 6155a3b59a00098a49552fc037f8993fd73037d6
           </div>
         </aside>
 
