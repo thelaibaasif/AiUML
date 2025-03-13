@@ -1,4 +1,6 @@
 import React, { useState } from "react";
+import { auth } from "../../firebase"; // Import Firebase auth
+import { signOut } from "firebase/auth";
 import { useNavigate } from "react-router-dom";
 import logo from "../../images/logo.png";
 import classDiagram from "../../images/classdiagram.jpeg";
@@ -64,6 +66,19 @@ const EditorPage = () => {
     }
   };
 
+  // Fuction to handle signout
+  const handleSignOut = async () => {
+    try {
+      await signOut(auth); 
+      sessionStorage.removeItem("user");
+      alert("Logged out successfully!");
+      navigate("/");
+    } catch (error) {
+      console.error("Logout error:", error.message);
+      alert("Failed to logout. Please try again.");
+    }
+  };
+
   return (
     <div className="bg-white min-h-screen flex flex-col">
       <header className="bg-gray-300 flex items-center justify-between px-4 py-2">
@@ -73,7 +88,7 @@ const EditorPage = () => {
         </div>
         <button
           className="bg-red-700 text-white px-4 py-2 rounded-md hover:bg-red-800"
-          onClick={() => navigate("/")}
+          onClick={handleSignOut}
         >
           Sign Out
         </button>

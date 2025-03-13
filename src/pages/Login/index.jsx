@@ -1,7 +1,8 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { signInWithEmailAndPassword } from "firebase/auth";
-import { auth } from "../../firebase";
+import { doc, getDoc } from "firebase/firestore";
+import { auth, db } from "../../firebase";
 import backgroundImage from "../../images/Login.png";
 import googleIcon from "../../images/google.png";
 import appleIcon from "../../images/apple.jpg";
@@ -45,7 +46,26 @@ const Login = () => {
     console.log("Login button clicked");
     if (validateEmail(formData.email) && validatePassword(formData.password)) {
       try {
-        await signInWithEmailAndPassword(auth, formData.email, formData.password);
+        const userCredential = await signInWithEmailAndPassword(
+          auth,
+          formData.email,
+          formData.password
+        );
+        
+        const user = userCredential.user;
+        console.log("User logged in:", user);
+
+        console.log("User logged in:", userCredential.user);
+        const userDoc = await getDoc(doc(db, "users", user.uid));
+
+        if (userDoc.exists()) {
+          const userData = userDoc.data();
+          console.log("User data from Firestore:", userData);
+
+          sessionStorage.setItem("user", JSON.stringify(userData));
+
+        alert(`Welcome back, ${userData.name}!`);
+        }
         alert("Login successful!");
         navigate("/EnhancedEditor");
       } catch (err) {
