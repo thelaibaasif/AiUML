@@ -1,5 +1,5 @@
 import React from "react";
-import diagramImage from "../../images/Diagram.png"; // your brain diagram image
+import diagramImage from "../../images/Diagram.png"; 
 
 const Diagrams = () => {
   return (

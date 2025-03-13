@@ -24,6 +24,8 @@ const EditorPage = () => {
   });
   const [zoomLevel, setZoomLevel] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
+  const [inputText, setInputText] = useState("");
+  const [output, setOutput] = useState("");
   const navigate = useNavigate();
 
   const handleZoomIn = () => setZoomLevel((prev) => Math.min(prev + 0.1, 2));
