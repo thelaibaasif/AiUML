@@ -1,7 +1,8 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { createUserWithEmailAndPassword } from "firebase/auth";
-import { auth } from "../../firebase";
+import { doc, setDoc } from "firebase/firestore";
+import { auth, db } from "../../firebase";
 import googleLogo from "../../images/icons8-google-1.svg";
 import appleLogo from "../../images/icons8-apple-logo-1.svg";
 import backgroundImg from "../../images/chris-lee-70l1tdai6rm-unsplash-1.png";
@@ -69,6 +70,28 @@ const SignUp = () => {
     } else {
       alert("Please fix the errors before submitting.");
     }
+
+    try {
+      const userCredentials = await createUserWithEmailAndPassword(auth, formData.email, formData.password);
+
+      const user = userCredentials.user;
+
+      await setDoc(doc(db, "users", user.uid), {
+        name: formData.name,
+        email: formData.email,
+        createdAt: new Date()
+      });
+
+
+      console.log("User registered with UID:", user.uid);
+
+      alert("Signup successful!");
+      navigate("/EnhancedEditor");
+
+    } catch (err) {
+      setErrors(err.message);
+    }
+
   };
 
   const handleSignInClick = (type) => {
