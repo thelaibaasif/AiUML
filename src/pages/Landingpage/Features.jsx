@@ -20,22 +20,22 @@ const features = [
     id: "02",
     title: "From text, software requirements, and simple prompts using GenerativeAI",
     image: feature2,
-    bgClass: "bg-light-blue",
-    curveClass: "rounded-bl-200px rounded-tl-200px",
+    bgClass: "bg-[#e9f5fc]",
+    curveClass: "rounded-tl-[250px] rounded-bl-[250px]",
   },
   {
     id: "03",
-    title: "Pattern recognition, optimization, and modeling complex relationships",
+    title: "Pattern recognition, optimization, modeling complex relationships",
     image: feature3,
     bgClass: "",
     curveClass: "",
   },
   {
     id: "04",
-    title: "Can take software descriptions and requirements as well",
+    title: "Can take software descriptions, and requirements as well",
     image: feature4,
-    bgClass: "bg-light-blue",
-    curveClass: "rounded-br-200px rounded-tr-200px",
+    bgClass: "bg-[#e9f5fc]",
+    curveClass: "rounded-tr-[250px] rounded-br-[250px]",
   },
   {
     id: "05",
@@ -48,8 +48,8 @@ const features = [
     id: "06",
     title: "Class, usecase, sequence, ERD diagrams",
     image: feature6,
-    bgClass: "bg-light-blue",
-    curveClass: "rounded-bl-200px rounded-tl-200px",
+    bgClass: "bg-[#e9f5fc]",
+    curveClass: "rounded-tl-[250px] rounded-bl-[250px]",
   },
   {
     id: "07",
@@ -62,36 +62,49 @@ const features = [
     id: "08",
     title: "Stores previous chats, diagrams, and their codes",
     image: feature8,
-    bgClass: "bg-light-blue",
-    curveClass: "rounded-br-200px rounded-tr-200px",
+    bgClass: "bg-[#e9f5fc]",
+    curveClass: "rounded-tr-[250px] rounded-br-[250px]",
   },
 ];
 
 const Features = () => {
   return (
-    <section className="container mx-auto px-0 py-16">
-      <h2 className="text-center text-red-700 font-bold text-2xl mb-8">
+    <section className="w-full py-20">
+      <h2 className="text-center text-red-700 font-extrabold text-5xl mb-16">
         Features
       </h2>
+
       {features.map((feature, index) => (
         <div
           key={feature.id}
-          className={`flex items-center w-full py-12 ${
-            index % 2 === 0 ? "flex-row" : "flex-row-reverse"
-          } ${feature.bgClass} ${feature.curveClass} px-8`}
+          className={`flex flex-col lg:flex-row items-center justify-between w-full py-20 gap-12 ${
+            index % 2 === 0 ? "lg:flex-row" : "lg:flex-row-reverse"
+          } ${feature.bgClass} ${feature.curveClass}`}
         >
-          <div className="w-1/2 p-8">
+          {/* Text Section */}
+          <div className="w-full lg:w-1/2 px-6 lg:px-20">
+            <div className="flex items-start gap-6">
+              {/* Big Number */}
+              <span className="text-[90px] font-extrabold text-gray-400 leading-none">
+                {feature.id}
+              </span>
+
+              {/* Multi-line Description */}
+              <div className="text-black text-[30px] font-semibold leading-snug space-y-2">
+                {feature.title.split(",").map((line, i) => (
+                  <p key={i}>{line.trim()}</p>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* Image Section */}
+          <div className="w-full lg:w-1/2 px-6 lg:px-20">
             <img
               src={feature.image}
               alt={feature.title}
-              className="w-full h-auto"
+              className="w-[80%] max-w-[600px] h-auto mx-auto rounded-xl"
             />
-          </div>
-          <div className="w-1/2 text-center md:text-left p-8">
-            <h3 className="text-gray-800 text-4xl font-bold mb-4">
-              {feature.id}
-            </h3>
-            <p className="text-gray-600 text-lg">{feature.title}</p>
           </div>
         </div>
       ))}

@@ -6,52 +6,45 @@ import customization from "../../images/customization.png";
 
 const ElevateUML = () => {
   return (
-    <div className="elevate-uml-section py-16 bg-white">
-      {/* Title Section */}
-      <h2 className="text-center text-3xl font-bold text-red-700">
+    <div className="bg-white py-32 w-full">
+      {/* Heading */}
+      <h2 className="text-center text-5xl md:text-6xl font-extrabold text-red-700">
         Elevate Your UML Experience
       </h2>
-      <p className="text-center text-gray-600 mt-4 mb-8">
+
+      {/* Subheading */}
+      <p className="text-center text-2xl text-gray-600 mt-4 mb-16">
         Unleashing Creativity with AI-Powered UML Diagrams
       </p>
 
-      {/* Features Grid with Boxes */}
-      <div className="features-grid grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-6xl mx-auto">
-        {/* Feature 1 */}
-        <div className="flex flex-col items-center text-center border border-gray-300 rounded-lg p-6 hover:shadow-lg">
-          <img src={keyboard} alt="Input" className="w-16 h-16 mb-4" />
-          <p className="font-semibold text-lg">
-            Unrestrictive Textual Input and Prompts
-          </p>
-        </div>
-
-        {/* Feature 2 */}
-        <div className="flex flex-col items-center text-center border border-gray-300 rounded-lg p-6 hover:shadow-lg">
-          <img src={automation} alt="Automation" className="w-16 h-16 mb-4" />
-          <p className="font-semibold text-lg">
-            Automated Diagram Generation
-          </p>
-        </div>
-
-        {/* Feature 3 */}
-        <div className="flex flex-col items-center text-center border border-gray-300 rounded-lg p-6 hover:shadow-lg">
-          <img src={robot} alt="AI Optimization" className="w-16 h-16 mb-4" />
-          <p className="font-semibold text-lg">
-            AI Based Diagram Optimization
-          </p>
-        </div>
-
-        {/* Feature 4 */}
-        <div className="flex flex-col items-center text-center border border-gray-300 rounded-lg p-6 hover:shadow-lg">
-          <img
-            src={customization}
-            alt="Customization"
-            className="w-16 h-16 mb-4"
-          />
-          <p className="font-semibold text-lg">
-            Diagram Editing and Customization
-          </p>
-        </div>
+      {/* Grid Container with even side spacing */}
+      <div className="w-full px-16 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+        {[{
+          img: keyboard,
+          title: "Input",
+          desc: "Unrestrictive Textual Input and Prompts"
+        }, {
+          img: automation,
+          title: "Automation",
+          desc: "Automated Diagram Generation"
+        }, {
+          img: robot,
+          title: "AI Optimization",
+          desc: "AI Based Diagram Optimization"
+        }, {
+          img: customization,
+          title: "Customization",
+          desc: "Diagram Editing and Customization"
+        }].map((feature, i) => (
+          <div
+            key={i}
+            className="flex flex-col items-center text-center border-2 border-red-500 rounded-2xl p-6 hover:shadow-md transition bg-white"
+          >
+            <img src={feature.img} alt={feature.title} className="w-24 h-24 mb-4" />
+            <h3 className="text-2xl font-bold">{feature.title}</h3>
+            <p className="text-xl font-medium py-4">{feature.desc}</p>
+          </div>
+        ))}
       </div>
     </div>
   );

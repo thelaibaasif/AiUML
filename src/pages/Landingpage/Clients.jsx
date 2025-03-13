@@ -28,7 +28,7 @@ const testimonials = [
 const Clients = () => {
   return (
     <section className="clients-section py-16">
-      <h2 className="font-bold text-2xl text-center text-red-700 mb-8">
+      <h2 className="font-bold text-4xl text-center text-red-700 mb-8">
         Clients
       </h2>
       <div className="flex justify-center gap-8 px-4 flex-wrap">

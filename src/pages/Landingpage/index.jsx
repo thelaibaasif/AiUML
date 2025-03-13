@@ -8,10 +8,10 @@ import Clients from './Clients';
 import ConnectWithUs from './ConnectWithUs';
 import Footer from './Footer';
 
-const LandingPage = () => {
+const LandingPage = ({ setIsDark }) => {
   return (
     <div>
-      <Header />
+      <Header setIsDark={setIsDark} />
       <div id="about">
         <ElevateUML />
       </div>

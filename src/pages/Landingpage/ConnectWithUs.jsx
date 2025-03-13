@@ -7,7 +7,7 @@ const ConnectWithUs = () => {
       <div className="container mx-auto grid grid-cols-1 md:grid-cols-2 gap-16 items-center">
         {/* Left Section */}
         <div>
-          <h2 className="text-red-700 text-2xl font-bold mb-4">Connect with us</h2>
+          <h2 className="text-red-700 text-4xl font-bold mb-4">Connect with us</h2>
           <p className="text-gray-700 leading-relaxed mb-6">
             We're here to help and eager to hear from you! Whether you have a question, want
             to learn more about our services, or are interested in collaborating, feel free to
