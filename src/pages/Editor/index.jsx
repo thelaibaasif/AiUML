@@ -10,9 +10,10 @@ import sequenceDiagram from "../../images/sequencediagram.png";
 import sampleCodeImage from "../../images/plantuml_code.png";
 import Loader from "../../components/Loader";
 import MenuButton from "../../components/MenuButton";
+import AceEditor from "react-ace";
+import "ace-builds/src-noconflict/mode-text";
+import "ace-builds/src-noconflict/theme-github";
 //import TokenLimitedInput from "../../components/TokenLimitedInput";
-
-
 
 const EditorPage = () => {
   const [showSaveModal, setShowSaveModal] = useState(false);
@@ -29,6 +30,7 @@ const EditorPage = () => {
   const [inputText, setInputText] = useState("");
   const [output, setOutput] = useState("");
   const navigate = useNavigate();
+  const aceEditorRef = React.useRef(null);
 
   const handleZoomIn = () => setZoomLevel((prev) => Math.min(prev + 0.1, 2));
   const handleZoomOut = () => setZoomLevel((prev) => Math.max(prev - 0.1, 0.5));
@@ -61,6 +63,9 @@ const EditorPage = () => {
       const data = await response.json();
       console.log("Full Response:", JSON.stringify(data));
       setOutput(data.generated_code);
+      if(aceEditorRef.current) {
+        aceEditorRef.current.editor.setValue(data.generated_code);
+      }
       //output = data.generated_code;
       setActiveDiagram((prev) => ({
         ...prev,
@@ -126,11 +131,24 @@ const EditorPage = () => {
       room
     </>
   ) : activeTab === "Code" ? (
-    <img
-      src={sampleCodeImage}
-      alt="Sample Code"
-      className="max-w-full h-auto"
-    />
+    <AceEditor
+    mode="text"
+    theme="github"
+    name="plantuml-editor"
+    value={output}
+    onChange={newValue => setOutput(newValue)}
+    width="100%"
+    height="400px"
+    fontSize={14}
+    setOptions={{
+      enableBasicAutocompletion: true,
+      enableLiveAutocompletion: true,
+      highlightActiveLine: true,
+      showLineNumbers: true,
+      tabSize: 2,
+    }}
+  />
+
   ) : activeTab === "History" ? (
     <div className="text-sm text-black">
       <h3 className="text-xl font-bold text-red-700 mb-4">History</h3>
