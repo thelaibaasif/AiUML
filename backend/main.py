@@ -88,7 +88,7 @@ async def process_text(request: Request):
         #generated_code = result[0]["generated_text"]
 
         # Call the hosted API endpoint on Hugging Face Spaces via gradio_client
-        client = Client("vinzur/Prompt-to-PlantUML", hf_token="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")
+        client = Client("vinzur/Prompt-to-PlantUML", hf_token="REVOKED_TOKEN")
         result = client.predict(query=text, api_name="/predict")
         generated_code = result
         
