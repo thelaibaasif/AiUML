@@ -10,9 +10,10 @@ import sequenceDiagram from "../../images/sequencediagram.png";
 import sampleCodeImage from "../../images/plantuml_code.png";
 import Loader from "../../components/Loader";
 import MenuButton from "../../components/MenuButton";
+import AceEditor from "react-ace";
+import "ace-builds/src-noconflict/mode-text";
+import "ace-builds/src-noconflict/theme-github";
 //import TokenLimitedInput from "../../components/TokenLimitedInput";
-
-
 
 const EditorPage = () => {
   const [showSaveModal, setShowSaveModal] = useState(false);
@@ -29,17 +30,24 @@ const EditorPage = () => {
   const [inputText, setInputText] = useState("");
   const [output, setOutput] = useState("");
   const navigate = useNavigate();
+  const aceEditorRef = React.useRef(null);
 
   const handleZoomIn = () => setZoomLevel((prev) => Math.min(prev + 0.1, 2));
   const handleZoomOut = () => setZoomLevel((prev) => Math.max(prev - 0.1, 0.5));
   const handleResetZoom = () => setZoomLevel(1);
 
-  const handleChatSubmit = () => {
+  //handle chat submit and loading
+  const handleChatSubmit = async () => {
+    if (!inputText.trim()) return; // Prevent empty submissions
     setIsLoading(true);
-    setTimeout(() => {
+    try {
+      await handleSubmit();
+    } catch (error) {
+      console.error("Submission error:", error);
+    } finally {
       setIsLoading(false);
-    }, 2000);
-  };
+    }
+  };  
 
    // Function to handle submission
    const handleSubmit = async () => {
@@ -55,6 +63,10 @@ const EditorPage = () => {
       const data = await response.json();
       console.log("Full Response:", JSON.stringify(data));
       setOutput(data.generated_code);
+      if(aceEditorRef.current) {
+        aceEditorRef.current.editor.setValue(data.generated_code);
+      }
+      //output = data.generated_code;
       setActiveDiagram((prev) => ({
         ...prev,
         image: data.diagram_url,
@@ -119,11 +131,24 @@ const EditorPage = () => {
       room
     </>
   ) : activeTab === "Code" ? (
-    <img
-      src={sampleCodeImage}
-      alt="Sample Code"
-      className="max-w-full h-auto"
-    />
+    <AceEditor
+    mode="text"
+    theme="github"
+    name="plantuml-editor"
+    value={output}
+    onChange={newValue => setOutput(newValue)}
+    width="100%"
+    height="400px"
+    fontSize={14}
+    setOptions={{
+      enableBasicAutocompletion: true,
+      enableLiveAutocompletion: true,
+      highlightActiveLine: true,
+      showLineNumbers: true,
+      tabSize: 2,
+    }}
+  />
+
   ) : activeTab === "History" ? (
     <div className="text-sm text-black">
       <h3 className="text-xl font-bold text-red-700 mb-4">History</h3>
@@ -170,21 +195,20 @@ const EditorPage = () => {
               <input
                 type="text"
                 placeholder="Type here...(0/3000)"
+                value={inputText}
+                onChange={(e) => setInputText(e.target.value)}
                 className="flex-grow px-4 py-2 rounded-md border border-gray-300"
               />
               
             </div>
-            <button
-              onClick={handleChatSubmit}
-              className={`w-full py-2 text-white rounded-md ${
-                activeTab === "Chat"
-                  ? "bg-red-700 hover:bg-red-800"
-                  : "bg-red-700 hover:bg-red-800"
-              }`}
-            >
-              {activeTab === "Chat" ? "Submit" : "Edit"} 
-              
-            </button>
+          <button
+            onClick={handleChatSubmit}
+            disabled={isLoading}
+            className=
+            {`w-full py-2 text-white rounded-md ${isLoading ? "opacity-50 cursor-not-allowed" : "bg-red-700 hover:bg-red-800"}`}
+          >
+            {activeTab === "Chat" ? "Submit" : "Edit"}
+          </button>
           </div>
         </aside>
 

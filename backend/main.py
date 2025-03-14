@@ -3,7 +3,8 @@ import base64
 import requests
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
-from transformers import pipeline
+#from transformers import pipeline
+from gradio_client import Client
 
 app = FastAPI()
 
@@ -17,7 +18,7 @@ app.add_middleware(
 )
 
 # Load model pipeline with a max length of 1024
-pipe = pipeline("text2text-generation", model="vinzur/results", max_length=1024)
+#pipe = pipeline("text2text-generation", model="vinzur/results", max_length=1024)
 #pipe = pipeline("text2text-generation", model="vinnyy/results", max_length=1024)
 
 PLANTUML_SERVER = "http://www.plantuml.com/plantuml"  
@@ -81,9 +82,16 @@ async def process_text(request: Request):
         return {"result": "No input provided."}
     
     try:
+        print("Processing the request...")
         # Generate PlantUML code using the model
-        result = pipe(text)
-        generated_code = result[0]["generated_text"]
+        #result = pipe(text)
+        #generated_code = result[0]["generated_text"]
+
+        # Call the hosted API endpoint on Hugging Face Spaces via gradio_client
+        client = Client("vinzur/Prompt-to-PlantUML", hf_token="REVOKED_TOKEN")
+        result = client.predict(query=text, api_name="/predict")
+        generated_code = result
+        
         print("Generated PlantUML Code:", generated_code)
 
         # Encode the generated code for PlantUML rendering
