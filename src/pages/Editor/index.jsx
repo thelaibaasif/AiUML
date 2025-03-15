@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import { auth } from "../../firebase"; // Import Firebase auth
 import { signOut } from "firebase/auth";
 import { useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
+//import { useEffect } from "react";
 import logo from "../../images/logo.png";
 import classDiagram from "../../images/classdiagram.jpeg";
 import useCaseDiagram from "../../images/usecasediagram.png";
@@ -10,6 +12,8 @@ import sequenceDiagram from "../../images/sequencediagram.png";
 import sampleCodeImage from "../../images/plantuml_code.png";
 import Loader from "../../components/Loader";
 import MenuButton from "../../components/MenuButton";
+import EditWithAI from "../../components/EditWithAI";
+//import Header from "./pages/Landingpage/Header.jsx";
 import AceEditor from "react-ace";
 import "ace-builds/src-noconflict/mode-text";
 import "ace-builds/src-noconflict/theme-github";
@@ -21,6 +25,9 @@ const EditorPage = () => {
   const [showCustomizeDropdown, setShowCustomizeDropdown] = useState(false);
   const [showColorsDropdown, setShowColorsDropdown] = useState(false);
   const [activeTab, setActiveTab] = useState("Chat");
+  const [chatMessages, setChatMessages] = useState([]);
+  const [activeButton, setActiveButton] = useState("");
+
   const [activeDiagram, setActiveDiagram] = useState({
     name: "Class Diagram",
     image: classDiagram,
@@ -36,6 +43,22 @@ const EditorPage = () => {
   const handleZoomOut = () => setZoomLevel((prev) => Math.max(prev - 0.1, 0.5));
   const handleResetZoom = () => setZoomLevel(1);
 
+  const handleSaveProject = () => {
+    const diagramState = {
+      diagram: activeDiagram,
+      zoom: zoomLevel,
+      messages: chatMessages,
+    };
+  
+    localStorage.setItem("savedDiagramState", JSON.stringify(diagramState));
+    alert("Diagram state saved successfully!");
+  };
+  const getButtonClass = (label) => {
+    return `${
+      activeButton === label ? "bg-gray-700" : "bg-red-700 hover:bg-gray-800"
+    } text-white px-4 py-2 rounded-full transition`;
+  };
+  
   //handle chat submit and loading
   const handleChatSubmit = async () => {
     if (!inputText.trim()) return; // Prevent empty submissions
@@ -47,6 +70,23 @@ const EditorPage = () => {
     } finally {
       setIsLoading(false);
     }
+
+    setChatMessages((prev) => [
+      ...prev,
+      { type: "user", text: inputText.trim() }
+    ]);
+    setInputText("");
+    setIsLoading(true);
+  
+    // Fake response from AI (optional)
+    setTimeout(() => {
+      setChatMessages((prev) => [
+        ...prev,
+        { type: "ai", text: "This is a mock AI response for: " + inputText.trim() }
+      ]);
+      setIsLoading(false);
+    }, 1000);
+  
   };  
 
    // Function to handle submission
@@ -95,9 +135,9 @@ const EditorPage = () => {
     <div className="bg-white min-h-screen flex flex-col">
       <header className="bg-gray-300 flex items-center justify-between px-4 py-2">
         <MenuButton />
-        <div className="flex items-center">
-          <img src={logo} alt="AiUML Logo" className="w-34 h-auto mr-2" />
-        </div>
+        <Link to="/" className="flex items-center">
+          <img src={logo} alt="AiUML Logo" className="w-34 h-auto mr-2 cursor-pointer" />
+        </Link>
         <button
           className="bg-red-700 text-white px-4 py-2 rounded-md hover:bg-red-800"
           onClick={handleSignOut}
@@ -111,7 +151,7 @@ const EditorPage = () => {
           <div>
             <h2 className="text-lg font-bold text-black mb-6">AI Chatbot System</h2>
             <div className="flex space-x-2 mb-6">
-              {["All", "History", "+New chat", "Chat", "Code"].map((tab) => (
+              {["History", "+New chat", "Chat", "Code"].map((tab) => (
                 <button
                   key={tab}
                   onClick={() => setActiveTab(tab)}
@@ -126,9 +166,24 @@ const EditorPage = () => {
             <div className="bg-gray-400 text-white p-4 rounded-md mb-4 shadow">
   {activeTab === "Chat" ? (
     <>
-      Draw a class diagram of a room in which there is a drawable,
-      furniture (e.g., couch), and some windows and walls around the
-      room
+{/* CHAT MESSAGES AREA */}
+<div className="bg-white border border-gray-300 rounded-md mb-4 w-full h-400px overflow-y-auto p-4 shadow-inner">
+  {chatMessages.map((msg, index) => (
+    <div
+      key={index}
+      className={`mb-2 p-2 rounded-md ${
+        msg.type === "user"
+          ? "bg-red-100 text-gray-800 text-right"
+          : "bg-gray-100 text-gray-800 text-left"
+      }`}
+    >
+      {msg.text}
+    </div>
+  ))}
+</div>
+
+
+
     </>
   ) : activeTab === "Code" ? (
     <AceEditor
@@ -191,16 +246,17 @@ const EditorPage = () => {
 
           </div>
           <div>
-            <div className="flex items-center space-x-2 mb-4">
-              <input
-                type="text"
-                placeholder="Type here...(0/3000)"
-                value={inputText}
-                onChange={(e) => setInputText(e.target.value)}
-                className="flex-grow px-4 py-2 rounded-md border border-gray-300"
-              />
-              
-            </div>
+            {/* CHAT INPUT */}
+<div className="flex items-center space-x-2 mb-4">
+  <input
+    type="text"
+    placeholder="Type here..."
+    value={inputText}
+    onChange={(e) => setInputText(e.target.value)}
+    className="flex-grow px-4 py-2 rounded-md border border-gray-300"
+  />
+  
+</div>
           <button
             onClick={handleChatSubmit}
             disabled={isLoading}
@@ -217,8 +273,9 @@ const EditorPage = () => {
             {[{ label: "Colors", state: showColorsDropdown, setState: setShowColorsDropdown }, { label: "Customize", state: showCustomizeDropdown, setState: setShowCustomizeDropdown }, { label: "Diagram", state: showDiagramDropdown, setState: setShowDiagramDropdown }].map(({ label, state, setState }) => (
               <div key={label} className="relative">
                 <button
-                  className="bg-red-700 text-white px-4 py-2 rounded-full hover:bg-red-800"
+                  className="bg-red-700 text-white px-4 py-2 rounded-full hover:bg-gray-800"
                   onClick={() => setState(!state)}
+                  
                 >
                   {label}
                 </button>
@@ -271,13 +328,16 @@ const EditorPage = () => {
                 )}
               </div>
             ))}
+
             <button
-              className="bg-red-700 text-white px-4 py-2 rounded-full hover:bg-red-800"
-              onClick={() => setShowSaveModal(true)}
+              className="bg-red-700 text-white px-4 py-2 rounded-full hover:bg-gray-800"
+              onClick={handleSaveProject}
             >
               Save
             </button>
-            <button className="bg-red-700 text-white px-4 py-2 rounded-full hover:bg-red-800">
+            <button className="bg-red-700 text-white px-4 py-2 rounded-full hover:bg-gray-800"
+            onClick={() => setShowSaveModal(true)}
+            >
               Export
             </button>
           </div>
@@ -308,7 +368,12 @@ const EditorPage = () => {
             </div>
           </div>
 
-          <div className="absolute bottom-4 right-6 flex space-x-2">
+          <div className="absolute bottom-4 right-6 flex space-x-5">
+            {/* Insert EditWithAI Button here */}
+            <div className="flex items-center">
+              <EditWithAI />
+            </div>
+            
             <button
               className="bg-gray-700 text-white px-4 py-2 rounded-md"
               onClick={handleZoomIn}
@@ -330,11 +395,11 @@ const EditorPage = () => {
           </div>
         </main>
       </div>
-
+      
       {showSaveModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white rounded-md shadow-md p-6 w-1/3">
-            <h3 className="text-lg font-bold mb-4 text-center">Save Options</h3>
+            <h3 className="text-lg font-bold mb-4 text-center">Export Options</h3>
             <div className="flex flex-col items-center">
               <button className="border border-gray-500 px-6 py-2 rounded-md text-gray-700 mb-4 hover:bg-gray-100">
                 Download SVG
@@ -381,7 +446,10 @@ const EditorPage = () => {
         Powered by AiUML | Enhance your system designs with automated diagrams.
       </footer>
     </div>
+    
   );
+
+  
 };
 
 export default EditorPage;
