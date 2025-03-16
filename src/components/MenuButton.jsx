@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
+//import Feedback from "./Feedback";
 
 const MenuButton = () => {
   const [showOptions, setShowOptions] = useState(false);
@@ -8,6 +9,7 @@ const MenuButton = () => {
 
   const toggleMenu = () => setShowOptions(!showOptions);
 
+  
   return (
     <StyledWrapper>
       <div className="menu-wrapper">
@@ -33,10 +35,11 @@ const MenuButton = () => {
               {/* Account Icon */}
               Account
             </button>
-            <button className="value">
+            <button className="value" onClick={() => navigate("/Feedback")}>
               {/* Feedback Icon */}
               Feedback
             </button>
+
             <button className="value">
               {/* Logout Icon */}
               Logout
