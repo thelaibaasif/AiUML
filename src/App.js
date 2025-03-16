@@ -7,6 +7,7 @@ import LandingPage from "./pages/Landingpage/index.jsx";
 import Features from "./pages/Landingpage/Features.jsx";
 import Profile from "./components/Profile"; 
 import Feedback from "./components/Feedback";
+import BusinessPlanPage from "./components/BusinessPlanPage";
 
 function App() {
   return (
@@ -17,6 +18,7 @@ function App() {
       <Route path="/EnhancedEditor" element={<Editor />} />
       <Route path="/feedback" element={<Feedback />} />
       <Route path="/profile" element={<Profile />} />
+      <Route path="/plans" element={<BusinessPlanPage />} />
       <Route path="/" element={<LandingPage />} />
     </Routes>
   );

@@ -57,7 +57,7 @@ const ConnectWithUs = () => {
             </div>
             <button
               type="submit"
-              className="w-full bg-red-700 text-white py-3 rounded-lg font-semibold hover:bg-red-800 transition"
+              className="w-full bg-red-700 text-white py-3 rounded-lg font-semibold hover:bg-gray-800 transition"
             >
               Submit
             </button>
