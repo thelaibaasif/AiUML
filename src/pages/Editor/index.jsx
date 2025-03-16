@@ -163,11 +163,11 @@ const EditorPage = () => {
                 </button>
               ))}
             </div>
-            <div className="bg-gray-400 text-white p-4 rounded-md mb-4 shadow">
+            <div className="">
   {activeTab === "Chat" ? (
     <>
 {/* CHAT MESSAGES AREA */}
-<div className="bg-white border border-gray-300 rounded-md mb-4 w-full h-400px overflow-y-auto p-4 shadow-inner">
+<div className="bg-white border border-gray-300 rounded-md mb-4 w-full h-80 overflow-y-auto p-4 shadow-inner">
   {chatMessages.map((msg, index) => (
     <div
       key={index}
