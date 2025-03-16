@@ -1,11 +1,14 @@
 import React from "react";
-//import GoBack from "../../components/GoBack";
+import { useNavigate } from "react-router-dom";
+import GoBack from "./GoBack";
 
 const Profile = () => {
+  const navigate = useNavigate();
+
   return (
     
     <div className="min-h-screen bg-[#EAF6FE] text-gray-800 px-6 py-10 font-sans">
-      
+      <GoBack onClick={() => navigate(-1)} />
       <div className="max-w-3xl mx-auto bg-white shadow-lg rounded-2xl p-8">
         
         <h1 className="text-3xl font-bold text-red-700 mb-6 text-center">Personal Profile</h1>

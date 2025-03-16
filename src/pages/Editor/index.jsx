@@ -1,18 +1,19 @@
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { auth } from "../../firebase"; // Import Firebase auth
 import { signOut } from "firebase/auth";
 import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
-//import { useEffect } from "react";
 import logo from "../../images/logo.png";
 import classDiagram from "../../images/classdiagram.jpeg";
 import useCaseDiagram from "../../images/usecasediagram.png";
 import erdDiagram from "../../images/erddiagram.png";
 import sequenceDiagram from "../../images/sequencediagram.png";
-import sampleCodeImage from "../../images/plantuml_code.png";
 import Loader from "../../components/Loader";
 import MenuButton from "../../components/MenuButton";
 import EditWithAI from "../../components/EditWithAI";
+import ThemeSelector from "./ThemeSelector";
+
+
 //import Header from "./pages/Landingpage/Header.jsx";
 import AceEditor from "react-ace";
 import "ace-builds/src-noconflict/mode-text";
@@ -27,7 +28,7 @@ const EditorPage = () => {
   const [activeTab, setActiveTab] = useState("Chat");
   const [chatMessages, setChatMessages] = useState([]);
   const [activeButton, setActiveButton] = useState("");
-
+  const [showCustomizeModal, setShowCustomizeModal] = useState(false);
   const [activeDiagram, setActiveDiagram] = useState({
     name: "Class Diagram",
     image: classDiagram,
@@ -36,13 +37,41 @@ const EditorPage = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [inputText, setInputText] = useState("");
   const [output, setOutput] = useState("");
+  const [messages, setMessages] = useState([]);
+  const [input, setInput] = useState("");
+  const [historyData, setHistoryData] = useState([
+    "UseCase Diagram @123",
+    "Class Diagram @123",
+    "Sequence Diagram @123",
+    "ERD Diagram @123",
+  ]);
+  const colorsRef = useRef(null);
+  const customizeRef = useRef(null);
+  const diagramRef = useRef(null);
   const navigate = useNavigate();
   const aceEditorRef = React.useRef(null);
-
+  const [searchQuery, setSearchQuery] = useState("");
   const handleZoomIn = () => setZoomLevel((prev) => Math.min(prev + 0.1, 2));
   const handleZoomOut = () => setZoomLevel((prev) => Math.max(prev - 0.1, 0.5));
   const handleResetZoom = () => setZoomLevel(1);
-
+  
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (colorsRef.current && !colorsRef.current.contains(event.target)) {
+        setShowColorsDropdown(false);
+      }
+      if (customizeRef.current && !customizeRef.current.contains(event.target)) {
+        setShowCustomizeDropdown(false);
+      }
+      if (diagramRef.current && !diagramRef.current.contains(event.target)) {
+        setShowDiagramDropdown(false);
+      }
+    };
+  
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+  
   const handleSaveProject = () => {
     const diagramState = {
       diagram: activeDiagram,
@@ -139,7 +168,7 @@ const EditorPage = () => {
           <img src={logo} alt="AiUML Logo" className="w-34 h-auto mr-2 cursor-pointer" />
         </Link>
         <button
-          className="bg-red-700 text-white px-4 py-2 rounded-md hover:bg-red-800"
+          className="bg-red-700 text-white px-4 py-2 rounded-md hover:bg-gray-800"
           onClick={handleSignOut}
         >
           Sign Out
@@ -154,7 +183,18 @@ const EditorPage = () => {
               {["History", "+New chat", "Chat", "Code"].map((tab) => (
                 <button
                   key={tab}
-                  onClick={() => setActiveTab(tab)}
+                  onClick={() => {
+                    if (tab === "+New chat") {
+                      setChatMessages([]);   // clear previous messages
+                      setInputText("");      // reset input
+                      setActiveTab("Chat");  // switch to Code tab
+                      //setActiveTab("Code");  
+                    } else {
+                      setActiveTab(tab);     // normal tab switch
+                    }
+                  }}
+                  
+                  
                   className={`px-4 py-2 rounded-md font-semibold text-white transition duration-150 ${
                     activeTab === tab ? "bg-gray-700" : "bg-red-700"
                   } hover:bg-gray-800`}
@@ -207,6 +247,14 @@ const EditorPage = () => {
   ) : activeTab === "History" ? (
     <div className="text-sm text-black">
       <h3 className="text-xl font-bold text-red-700 mb-4">History</h3>
+      {/* 🔍 Search Input */}
+    <input
+      type="text"
+      placeholder="Search by title..."
+      className="mb-4 px-4 py-2 w-full border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-700"
+      value={searchQuery}
+      onChange={(e) => setSearchQuery(e.target.value)}
+    />
       <table className="w-full text-left">
         <thead>
           <tr className="text-red-700 font-semibold">
@@ -217,12 +265,13 @@ const EditorPage = () => {
           </tr>
         </thead>
         <tbody className="text-gray-900">
-          {[
-            "UseCase Diagram @123",
-            "Class Diagram @123",
-            "Sequence Diagram @123",
-            "ERD Diagram @123",
-          ].map((title, index) => (
+        {historyData
+  .filter((title) =>
+    title.toLowerCase().includes(searchQuery.toLowerCase())
+  )
+  .map((title, index) => (
+
+
             <tr key={index} className="border-t border-gray-200">
               <td className="py-2">{title}</td>
               <td className="py-2">1/2/21</td>
@@ -232,9 +281,16 @@ const EditorPage = () => {
                 </button>
               </td>
               <td className="py-2">
-                <button className="text-red-700 bg-red-700 p-2 rounded-full" >
-                  <span role="img" aria-label="delete">🗑️</span>
-                </button>
+              <button
+  onClick={() => {
+    const updated = historyData.filter((_, i) => i !== index);
+    setHistoryData(updated);
+  }}
+  className="text-red-700 bg-red-700 p-2 rounded-full"
+>
+  <span role="img" aria-label="delete">🗑️</span>
+</button>
+
               </td>
             </tr>
           ))}
@@ -245,27 +301,31 @@ const EditorPage = () => {
 </div>
 
           </div>
-          <div>
-            {/* CHAT INPUT */}
-<div className="flex items-center space-x-2 mb-4">
-  <input
-    type="text"
-    placeholder="Type here..."
-    value={inputText}
-    onChange={(e) => setInputText(e.target.value)}
-    className="flex-grow px-4 py-2 rounded-md border border-gray-300"
-  />
-  
-</div>
-          <button
-            onClick={handleChatSubmit}
-            disabled={isLoading}
-            className=
-            {`w-full py-2 text-white rounded-md ${isLoading ? "opacity-50 cursor-not-allowed" : "bg-red-700 hover:bg-red-800"}`}
-          >
-            {activeTab === "Chat" ? "Submit" : "Edit"}
-          </button>
-          </div>
+          {/* Only show chat input if not on History tab */}
+{activeTab !== "History" && (
+  <div>
+    <div className="flex items-center space-x-2 mb-4">
+      <input
+        type="text"
+        placeholder="Type here..."
+        value={inputText}
+        onChange={(e) => setInputText(e.target.value)}
+        className="flex-grow px-4 py-2 rounded-md border border-gray-300"
+      />
+    </div>
+
+    <button
+      onClick={handleChatSubmit}
+      disabled={isLoading}
+      className={`w-full py-2 text-white rounded-md ${
+        isLoading ? "opacity-50 cursor-not-allowed" : "bg-red-700 hover:bg-gray-800"
+      }`}
+    >
+      {activeTab === "Chat" ? "Submit" : "Edit"}
+    </button>
+  </div>
+)}
+
         </aside>
 
         <main className="flex-1 bg-white px-6 py-6 relative">
@@ -273,34 +333,44 @@ const EditorPage = () => {
             {[{ label: "Colors", state: showColorsDropdown, setState: setShowColorsDropdown }, { label: "Customize", state: showCustomizeDropdown, setState: setShowCustomizeDropdown }, { label: "Diagram", state: showDiagramDropdown, setState: setShowDiagramDropdown }].map(({ label, state, setState }) => (
               <div key={label} className="relative">
                 <button
-                  className="bg-red-700 text-white px-4 py-2 rounded-full hover:bg-gray-800"
+                  className={`${activeButton === label ? "bg-gray-700" : "bg-red-700 hover:bg-gray-800"} text-white px-4 py-2 rounded-full transition`}
                   onClick={() => setState(!state)}
                   
                 >
                   {label}
                 </button>
                 {label === "Colors" && state && (
-                  <div className="absolute mt-12 bg-white shadow-md rounded-md p-4 z-10">
-                    <h3 className="font-bold mb-2">Select Color Scheme:</h3>
-                    <div className="flex space-x-4">
-                      <div className="w-8 h-8 bg-red-700 rounded-full cursor-pointer"></div>
-                      <div className="w-8 h-8 bg-blue-700 rounded-full cursor-pointer"></div>
-                      <div className="w-8 h-8 bg-green-700 rounded-full cursor-pointer"></div>
-                    </div>
-                  </div>
-                )}
-                {label === "Customize" && state && (
-                  <div className="absolute mt-12 bg-white shadow-md rounded-md p-4 z-10">
-                    <h3 className="font-bold mb-2">Select Theme:</h3>
-                    <ul>
-                      <li className="hover:bg-gray-100 px-2 py-1 cursor-pointer">Light Theme</li>
-                      <li className="hover:bg-gray-100 px-2 py-1 cursor-pointer">Dark Theme</li>
-                      <li className="hover:bg-gray-100 px-2 py-1 cursor-pointer">High Contrast</li>
-                    </ul>
-                  </div>
-                )}
-                {label === "Diagram" && state && (
-                  <div className="absolute mt-12 bg-white shadow-md rounded-md p-4 z-10">
+  <div ref={colorsRef} className="absolute mt-12 bg-white shadow-md rounded-md p-6 z-10 w-58">
+    <h3 className="font-bold mb-3 text-center">Pick Any Color:</h3>
+    <div className="flex justify-center">
+      <input
+        type="color"
+        onChange={(e) => {
+          const pickedColor = e.target.value;
+          document.documentElement.style.setProperty('--tw-bg-opacity', '1');
+          document.documentElement.style.setProperty('--tw-text-opacity', '1');
+          document.documentElement.style.setProperty('--tw-bg-color', pickedColor);
+        }}
+        className="w-20 h-20 border-2 border-gray-300 rounded-full shadow-md cursor-pointer"
+      />
+    </div>
+  </div>
+)}
+
+{label === "Customize" && state && (
+  <div ref={customizeRef} className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <ThemeSelector
+      onSelectTheme={(theme) => {
+        console.log("Selected theme:", theme); // Replace this with actual usage
+        setShowCustomizeDropdown(false);
+      }}
+   />
+  </div>
+)}
+
+
+{label === "Diagram" && state && (
+  <div ref={diagramRef} className="absolute mt-12 bg-white shadow-md rounded-md p-4 z-10">
                     <h3 className="font-bold mb-2">Select Diagram Type:</h3>
                     <ul>
                       {["Class Diagram", "Use Case Diagram", "ERD", "Sequence Diagram"].map((name) => (
@@ -342,7 +412,7 @@ const EditorPage = () => {
             </button>
           </div>
 
-          <div className="border border-gray-300 rounded-md bg-white p-4 relative min-h-[400px]">
+          <div className="border border-gray-300 rounded-md bg-white p-4 relative min-h-[400px] overflow-auto">
             <h2 className="text-lg font-bold text-center mb-4">
               {activeDiagram.name}
             </h2>
@@ -375,19 +445,19 @@ const EditorPage = () => {
             </div>
             
             <button
-              className="bg-gray-700 text-white px-4 py-2 rounded-md"
+              className="bg-gray-700 text-white px-4 py-2 rounded-md hover:bg-gray-800"
               onClick={handleZoomIn}
             >
               +
             </button>
             <button
-              className="bg-gray-700 text-white px-4 py-2 rounded-md"
+              className="bg-gray-700 text-white px-4 py-2 rounded-md hover:bg-gray-800"
               onClick={handleResetZoom}
             >
               Reset
             </button>
             <button
-              className="bg-gray-700 text-white px-4 py-2 rounded-md"
+              className="bg-gray-700 text-white px-4 py-2 rounded-md hover:bg-gray-800"
               onClick={handleZoomOut}
             >
               -
@@ -401,12 +471,22 @@ const EditorPage = () => {
           <div className="bg-white rounded-md shadow-md p-6 w-1/3">
             <h3 className="text-lg font-bold mb-4 text-center">Export Options</h3>
             <div className="flex flex-col items-center">
-              <button className="border border-gray-500 px-6 py-2 rounded-md text-gray-700 mb-4 hover:bg-gray-100">
-                Download SVG
-              </button>
-              <button className="border border-gray-500 px-6 py-2 rounded-md text-gray-700 mb-4 hover:bg-gray-100">
-                Download PNG
-              </button>
+            <a
+  href={activeDiagram.image}
+  download="diagram.svg"
+  className="border border-gray-500 px-6 py-2 rounded-md text-gray-700 mb-4 hover:bg-gray-100 text-center"
+>
+  Download SVG
+</a>
+
+<a
+  href={activeDiagram.image}
+  download="diagram.png"
+  className="border border-gray-500 px-6 py-2 rounded-md text-gray-700 mb-4 hover:bg-gray-100 text-center"
+>
+  Download PNG
+</a>
+
               <div className="flex items-center space-x-4">
                 <label>
                   <input type="radio" name="size" className="mr-2" /> Auto
@@ -432,7 +512,7 @@ const EditorPage = () => {
             </div>
             <div className="flex justify-center mt-6">
               <button
-                className="bg-red-700 text-white px-4 py-2 rounded-md hover:bg-red-800"
+                className="bg-red-700 text-white px-4 py-2 rounded-md hover:bg-gray-800"
                 onClick={() => setShowSaveModal(false)}
               >
                 Close
