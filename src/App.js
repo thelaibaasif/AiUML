@@ -1,5 +1,6 @@
-import React from "react";
-import { Routes, Route } from "react-router-dom"; // Use Routes only
+import React, { useState } from "react"; // ✅ Add useState
+import { Routes, Route } from "react-router-dom";
+
 import SignUp from "./pages/Signup/index.jsx";
 import Login from "./pages/Login/index.jsx";
 import Editor from "./pages/Editor/index.jsx";
@@ -10,17 +11,21 @@ import Feedback from "./components/Feedback";
 import BusinessPlanPage from "./components/BusinessPlanPage";
 
 function App() {
+  const [isDark, setIsDark] = useState(false); // ✅ Theme state
+
   return (
-    <Routes>
-      <Route path="/signup" element={<SignUp />} />
-      <Route path="/login" element={<Login />} />
-      <Route path="/features" element={<Features />} />
-      <Route path="/EnhancedEditor" element={<Editor />} />
-      <Route path="/feedback" element={<Feedback />} />
-      <Route path="/profile" element={<Profile />} />
-      <Route path="/plans" element={<BusinessPlanPage />} />
-      <Route path="/" element={<LandingPage />} />
-    </Routes>
+    <div className={isDark ? "dark" : ""}> {/* ✅ Toggle dark class */}
+      <Routes>
+        <Route path="/signup" element={<SignUp />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/features" element={<Features />} />
+        <Route path="/EnhancedEditor" element={<Editor />} />
+        <Route path="/feedback" element={<Feedback />} />
+        <Route path="/profile" element={<Profile />} />
+        <Route path="/plans" element={<BusinessPlanPage />} />
+        <Route path="/" element={<LandingPage setIsDark={setIsDark} />} /> {/* ✅ Pass setter */}
+      </Routes>
+    </div>
   );
 }
 

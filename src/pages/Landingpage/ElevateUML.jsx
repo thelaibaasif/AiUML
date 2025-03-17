@@ -18,7 +18,8 @@ const ElevateUML = () => {
       </p>
 
       {/* Grid Container with even side spacing */}
-      <div className="w-full px-16 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+      <div className="w-full px-4 sm:px-6 md:px-10 lg:px-16 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8">
+
         {[{
           img: keyboard,
           title: "Input",

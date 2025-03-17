@@ -85,12 +85,14 @@ const Features = () => {
           <div className="w-full lg:w-1/2 px-6 lg:px-20">
             <div className="flex items-start gap-6">
               {/* Big Number */}
-              <span className="text-[90px] font-extrabold text-gray-400 leading-none">
+              <span className="text-5xl sm:text-6xl md:text-7xl lg:text-[90px] font-extrabold text-gray-400 leading-none">
+
                 {feature.id}
               </span>
 
               {/* Multi-line Description */}
-              <div className="text-black text-[30px] font-semibold leading-snug space-y-2">
+              <div className="text-black text-lg sm:text-xl md:text-2xl lg:text-[30px] font-semibold leading-snug space-y-2">
+
                 {feature.title.split(",").map((line, i) => (
                   <p key={i}>{line.trim()}</p>
                 ))}

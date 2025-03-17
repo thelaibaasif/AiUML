@@ -3,7 +3,8 @@ import umlDiagram from "../../images/umlDiagramCombined.png"; // merged image if
 
 const WhatIsAiUML = () => {
   return (
-    <div className="w-full py-28 px-6 lg:px-20 bg-white">
+    <div className="w-full py-20 px-4 sm:px-8 md:px-12 lg:px-20 bg-white">
+
       <div className="flex flex-col lg:flex-row items-center justify-between gap-12 w-full">
         {/* Image Section */}
         <div className="w-full lg:w-1/2">

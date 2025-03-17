@@ -11,6 +11,11 @@ const Loader = () => {
 };
 
 const StyledWrapper = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 50vh; /* Or 100vh depending on use case */
+
   .loader {
     position: relative;
     width: 2.5em;
@@ -73,12 +78,7 @@ const StyledWrapper = styled.div`
       box-shadow: 0.5em 1em rgba(61, 184, 143, 0.75), -0.5em -1em rgba(233, 169, 32, 0.75);
     }
   }
-
-  .loader {
-    position: absolute;
-    top: calc(50% - 1.25em);
-    left: calc(50% - 1.25em);
-  }
 `;
+
 
 export default Loader;

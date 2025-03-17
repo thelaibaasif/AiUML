@@ -180,11 +180,11 @@ const EditorPage = () => {
           <div>
             <h2 className="text-lg font-bold text-black mb-6">AI Chatbot System</h2>
             <div className="flex space-x-2 mb-6">
-              {["History", "+New chat", "Chat", "Code"].map((tab) => (
+              {["♺ Recent", "+ New", "Chat", "<> Code"].map((tab) => (
                 <button
                   key={tab}
                   onClick={() => {
-                    if (tab === "+New chat") {
+                    if (tab === "+ New") {
                       setChatMessages([]);   // clear previous messages
                       setInputText("");      // reset input
                       setActiveTab("Chat");  // switch to Code tab
@@ -225,7 +225,7 @@ const EditorPage = () => {
 
 
     </>
-  ) : activeTab === "Code" ? (
+  ) : activeTab === "<> Code" ? (
     <AceEditor
     mode="text"
     theme="github"
@@ -244,9 +244,9 @@ const EditorPage = () => {
     }}
   />
 
-  ) : activeTab === "History" ? (
+  ) : activeTab === "♺ Recent" ? (
     <div className="text-sm text-black">
-      <h3 className="text-xl font-bold text-red-700 mb-4">History</h3>
+      <h3 className="text-xl font-bold text-red-700 mb-4">♺ Recent</h3>
       {/* 🔍 Search Input */}
     <input
       type="text"
@@ -302,7 +302,7 @@ const EditorPage = () => {
 
           </div>
           {/* Only show chat input if not on History tab */}
-{activeTab !== "History" && (
+{activeTab !== "♺ Recent" && (
   <div>
     <div className="flex items-center space-x-2 mb-4">
       <input

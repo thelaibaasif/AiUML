@@ -10,8 +10,10 @@ import Footer from './Footer';
 
 const LandingPage = ({ setIsDark }) => {
   return (
-    <div>
+    <>
       <Header setIsDark={setIsDark} />
+      {/* ... other sections */}
+      <div>
       <div id="about">
         <ElevateUML />
       </div>
@@ -30,6 +32,9 @@ const LandingPage = ({ setIsDark }) => {
       </div>
       <Footer />
     </div>
+    </>
+
+    
   );
 };
 
