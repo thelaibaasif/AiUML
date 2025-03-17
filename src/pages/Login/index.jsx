@@ -102,9 +102,11 @@ const Login = () => {
 
   return (
     <div className="w-screen h-screen flex items-center justify-center bg-white">
-      <div className="flex w-full max-w-5xl h-[95%] shadow-md border rounded-lg overflow-hidden">
+      <div className="flex flex-col md:flex-row w-[90%] md:w-full max-w-5xl h-auto md:h-[95%] shadow-md border rounded-lg overflow-hidden">
+
         {/* Left Section */}
-        <div className="w-1/2 p-10 flex flex-col justify-center">
+        <div className="w-full md:w-1/2 p-6 sm:p-10 flex flex-col justify-center">
+
           <h1 className="text-2xl font-bold mb-2">Welcome back!</h1>
           <p className="text-sm text-gray-600 mb-4">
             Enter your Credentials to access your account
@@ -195,7 +197,8 @@ const Login = () => {
         </div>
 
         {/* Right Section */}
-        <div className="w-1/2 relative">
+        <div className="hidden md:block md:w-1/2 relative">
+
           <img
             src={backgroundImage}
             alt="Login Visual"

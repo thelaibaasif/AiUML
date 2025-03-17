@@ -31,11 +31,12 @@ const Clients = () => {
       <h2 className="font-bold text-4xl text-center text-red-700 mb-8">
         Clients
       </h2>
-      <div className="flex justify-center gap-8 px-4 flex-wrap">
+      <div className="flex flex-wrap justify-center gap-6 md:gap-8 px-4">
         {testimonials.map((testimonial, index) => (
           <div
             key={index}
-            className="bg-[#FEF9E7] border-2 border-yellow-300 rounded-lg p-6 shadow-md text-center w-[80%] sm:w-[60%] md:w-[40%] lg:w-[30%] flex flex-col items-center"
+            className="bg-[#FEF9E7] border-2 border-yellow-300 rounded-lg p-5 sm:p-6 shadow-md text-center w-full sm:w-[80%] md:w-[45%] lg:w-[30%] max-w-sm flex flex-col items-center"
+
           >
             <p className="text-gray-800 mb-4">{testimonial.feedback}</p>
             <div className="flex items-center gap-4">

@@ -50,7 +50,7 @@ const plans = [
 ];
 
 const PlanCard = ({ plan }) => (
-  <div className={`rounded-xl p-6 shadow-lg border ${
+  <div className={`rounded-xl p-6 shadow-lg border h-full flex flex-col justify-between ${
     plan.highlight ? "bg-gradient-to-br from-purple-600 to-pink-600 text-white" : "bg-white"
   } transition-all hover:scale-105`}>  
     <h3 className="text-xl font-bold mb-2 text-center">{plan.name}</h3>
@@ -85,7 +85,7 @@ const BusinessPlanPage = () => {
             Scale your UML diagram needs as you grow. Choose the right plan for students, developers, and teams.
             </p>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6">
             {plans.map((plan, idx) => (
                 <PlanCard key={idx} plan={plan} />
             ))}

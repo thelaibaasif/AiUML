@@ -42,10 +42,13 @@ const Radio = () => {
 
 const StyledWrapper = styled.div`
   .radio {
-    display: flex;
-    justify-content: center;
-    gap: 10px;
-  }
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  padding: 1rem;
+}
+
 
   .radio > input {
     position: absolute;
@@ -53,12 +56,19 @@ const StyledWrapper = styled.div`
   }
 
   .radio > label {
-    cursor: pointer;
+  cursor: pointer;
+  font-size: 24px;
+  position: relative;
+  display: inline-block;
+  transition: transform 0.3s ease;
+}
+
+@media (min-width: 640px) {
+  .radio > label {
     font-size: 30px;
-    position: relative;
-    display: inline-block;
-    transition: transform 0.3s ease;
   }
+}
+
 
   .radio > label > svg {
     fill: #666;

@@ -1,11 +1,15 @@
 import React from 'react';
 import styled from 'styled-components';
 
-const Switch = () => {
+const Switch = ({ setIsDark }) => {
+  const handleToggle = (e) => {
+    setIsDark(e.target.checked);
+  };
+
   return (
     <StyledWrapper>
       <div className="wrapper">
-        <input type="checkbox" name="checkbox" className="switch" />
+        <input type="checkbox" name="checkbox" className="switch" onChange={handleToggle}/>
       </div>
     </StyledWrapper>
   );
@@ -29,6 +33,60 @@ const StyledWrapper = styled.div`
     overflow: hidden;
   }
 
+  /* Responsive scaling */
+  @media (max-width: 768px) {
+    .switch {
+      width: 90px;
+      height: 32px;
+    }
+
+    .switch:after {
+      width: 28px;
+      height: 28px;
+    }
+
+    .switch:checked:after {
+      transform: translateX(58px);
+    }
+    .switch:before,
+  .switch:checked:before {
+    width: 12px;
+    height: 12px;
+    top: 4px;
+    left: 12px;
+    transform-origin: 45px 8px;
+  }
+    @keyframes on {
+      0% {
+        transform: translateX(0px);
+        width: 28px;
+      }
+      50% {
+        width: 50px;
+        border-radius: 15px;
+      }
+      100% {
+        transform: translateX(58px);
+        width: 28px;
+      }
+    }
+
+    @keyframes off {
+      0% {
+        transform: translateX(58px);
+        width: 28px;
+      }
+      50% {
+        width: 50px;
+        border-radius: 15px;
+      }
+      100% {
+        transform: translateX(0px);
+        width: 28px;
+      }
+    }
+  }
+
   .switch:checked {
     background-color: rgb(0, 195, 255);
     background-size: cover;
@@ -49,23 +107,6 @@ const StyledWrapper = styled.div`
     box-shadow: inset 5px -5px 4px rgba(53, 53, 53, 0.3);
   }
 
-  @keyframes off {
-    0% {
-      transform: translateX(80px);
-      width: 36px;
-    }
-
-    50% {
-      width: 65px;
-      border-radius: 15px;
-    }
-
-    100% {
-      transform: translateX(0px);
-      width: 36px;
-    }
-  }
-
   .switch:checked:after {
     animation: on .7s forwards cubic-bezier(.8, .5, .2, 1.4);
     box-shadow: inset -5px -5px 4px rgba(53, 53, 53, 0.3);
@@ -76,14 +117,27 @@ const StyledWrapper = styled.div`
       transform: translateX(0px);
       width: 36px;
     }
-
     50% {
       width: 65px;
       border-radius: 15px;
     }
-
     100% {
       transform: translateX(80px);
+      width: 36px;
+    }
+  }
+
+  @keyframes off {
+    0% {
+      transform: translateX(80px);
+      width: 36px;
+    }
+    50% {
+      width: 65px;
+      border-radius: 15px;
+    }
+    100% {
+      transform: translateX(0px);
       width: 36px;
     }
   }
@@ -110,29 +164,26 @@ const StyledWrapper = styled.div`
       box-shadow: 5px -1px 0px #fff;
       filter: blur(0px);
     }
-
     50% {
       background-color: transparent;
       box-shadow: 5px -1px 0px #fff;
       filter: blur(0px);
     }
-
     90% {
       background-color: #f5daaa;
       box-shadow: 0px 0px 10px #f5deb4,
-      0px 0px 20px #f5deb4,
-      0px 0px 30px #f5deb4,
-       inset 0px 0px 2px #efd3a3;
+        0px 0px 20px #f5deb4,
+        0px 0px 30px #f5deb4,
+        inset 0px 0px 2px #efd3a3;
       filter: blur(1px);
     }
-
     100% {
       transform: rotate(0deg);
       background-color: #f5daaa;
       box-shadow: 0px 0px 10px #f5deb4,
-      0px 0px 20px #f5deb4,
-      0px 0px 30px #f5deb4,
-       inset 0px 0px 2px #efd3a3;
+        0px 0px 20px #f5deb4,
+        0px 0px 30px #f5deb4,
+        inset 0px 0px 2px #efd3a3;
       filter: blur(1px);
     }
   }
@@ -148,9 +199,9 @@ const StyledWrapper = styled.div`
     filter: blur(1px);
     background-color: #f5daaa;
     box-shadow: 0px 0px 10px #f5deb4,
-  0px 0px 20px #f5deb4,
-  0px 0px 30px #f5deb4,
-   inset 0px 0px 2px #efd3a3;
+      0px 0px 20px #f5deb4,
+      0px 0px 30px #f5deb4,
+      inset 0px 0px 2px #efd3a3;
     transform-origin: 53px 10px;
     animation: moon .7s forwards ease;
   }
@@ -160,23 +211,21 @@ const StyledWrapper = styled.div`
       transform: rotate(0deg);
       filter: blur(1px);
     }
-
     50% {
       filter: blur(1px);
     }
-
     90% {
       background-color: transparent;
       box-shadow: 5px -1px 0px #fff;
       filter: blur(0px);
     }
-
     100% {
       transform: rotate(170deg);
       background-color: transparent;
       box-shadow: 5px -1px 0px #fff;
       filter: blur(0px);
     }
-  }`;
+  }
+`;
 
 export default Switch;

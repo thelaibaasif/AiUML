@@ -115,10 +115,12 @@ const SignUp = () => {
 
   return (
     <div className="flex justify-center items-center min-h-[85vh] bg-white w-full">
-      <div className="flex bg-white shadow-md overflow-hidden rounded-lg w-[95%] max-w-6xl">
+      <div className="flex flex-col md:flex-row bg-white shadow-md overflow-hidden rounded-lg w-[95%] max-w-6xl">
+
 
         {/* Left Section */}
-        <div className="w-1/2 p-10">
+        <div className="w-full md:w-1/2 p-6 sm:p-10">
+
           <h1 className="text-3xl font-bold mb-6 text-gray-800">Get Started Now</h1>
           <form onSubmit={handleSubmit}>
             {/* Name Input */}
@@ -210,7 +212,8 @@ const SignUp = () => {
         </div>
 
         {/* Right Section */}
-        <div className="w-1/2 relative">
+        <div className="hidden md:block md:w-1/2 relative">
+
           <img src={backgroundImg} alt="Background" className="w-full h-full object-cover" />
           <img src={logoImg} alt="Logo" className="absolute top-4 left-1/2 transform -translate-x-1/2 w-20" />
         </div>

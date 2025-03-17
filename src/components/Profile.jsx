@@ -7,7 +7,7 @@ const Profile = () => {
 
   return (
     
-    <div className="min-h-screen bg-[#EAF6FE] text-gray-800 px-6 py-10 font-sans">
+    <div className="min-h-screen bg-[#EAF6FE] text-gray-800 px-4 sm:px-6 py-8 sm:py-10 font-sans">
       <GoBack onClick={() => navigate(-1)} />
       <div className="max-w-3xl mx-auto bg-white shadow-lg rounded-2xl p-8">
         

@@ -7,6 +7,10 @@ module.exports = {
   theme: {
     extend: {
       colors: {
+        darkBg: '#FFDE80',
+        darkCard: '#16213e',
+        darkText: '#eaeaea',
+        brandRed: '#a4161a',
         "light-blue": "#EAF6FE", // Updated light blue color for the background
         "red-700": "#940B36",   // Correct red-700 color
         "gray-600": "#4B5563",  // Standard gray-600 for text

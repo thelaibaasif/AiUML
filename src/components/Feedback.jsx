@@ -6,9 +6,11 @@ import GoBack from "./GoBack";
 const Feedback = () => {
   const navigate = useNavigate();
   return (
-    <div className="flex items-center justify-center min-h-screen bg-[#f6f8fa] px-4">
-      <GoBack onClick={() => navigate(-1)} />
-      <div className="bg-white shadow-2xl rounded-3xl p-8 max-w-lg w-full border border-slate-200 text-slate-700">
+    <div className="min-h-screen bg-[#f6f8fa] px-4 py-8 flex flex-col items-center justify-center">
+  <div className="w-full max-w-2xl">
+    <GoBack onClick={() => navigate(-1)} />
+  </div>
+  <div className="bg-white shadow-2xl rounded-3xl p-6 sm:p-8 w-full max-w-lg border border-slate-200 text-slate-700 mt-4">
         <h1 className="text-center text-red-700 text-2xl font-extrabold mb-6">
           ✨ We Value Your Feedback!
         </h1>

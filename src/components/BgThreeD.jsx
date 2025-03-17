@@ -46,17 +46,30 @@ const Loader = () => {
 }
 
 const StyledWrapper = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 80vh;
+  background: #f0f4f8;
+  overflow: hidden;
+  position: relative;
+
+  .container {
+    position: relative;
+    width: 100%;
+    height: 100%;
+  }
+
   .bubble {
     position: absolute;
     width: 200px;
     height: 200px;
     border-radius: 50%;
-    box-shadow: inset 0 0 25px rgba (255, 255, 255, 0.25);
+    box-shadow: inset 0 0 25px rgba(255, 255, 255, 0.25);
     animation: animate_4010 8s ease-in-out infinite;
   }
 
   .bubble:nth-child(2) {
-    position: relative;
     zoom: 0.45;
     left: -10px;
     top: -100px;
@@ -64,7 +77,6 @@ const StyledWrapper = styled.div`
   }
 
   .bubble:nth-child(3) {
-    position: relative;
     zoom: 0.45;
     right: -80px;
     top: -300px;
@@ -72,7 +84,6 @@ const StyledWrapper = styled.div`
   }
 
   .bubble:nth-child(4) {
-    position: relative;
     zoom: 0.35;
     left: -120px;
     bottom: -200px;
@@ -80,7 +91,6 @@ const StyledWrapper = styled.div`
   }
 
   .bubble:nth-child(5) {
-    position: relative;
     zoom: 0.5;
     left: 0px;
     top: 200px;
@@ -88,39 +98,36 @@ const StyledWrapper = styled.div`
   }
 
   @keyframes animate_4010 {
-    0%,100% {
+    0%, 100% {
       transform: translateY(-20px);
     }
-
     50% {
       transform: translateY(20px);
     }
   }
 
-  .bubble::before {
+  .bubble::before,
+  .bubble::after {
     content: '';
     position: absolute;
-    top: 50px;
-    left: 45px;
-    width: 30px;
-    height: 30px;
-    border-radius: 50%;
     background: #fff;
+    border-radius: 50%;
     z-index: 10;
     filter: blur(2px);
   }
 
+  .bubble::before {
+    top: 50px;
+    left: 45px;
+    width: 30px;
+    height: 30px;
+  }
+
   .bubble::after {
-    content: '';
-    position: absolute;
     top: 80px;
     left: 80px;
     width: 20px;
     height: 20px;
-    border-radius: 50%;
-    background: #fff;
-    z-index: 10;
-    filter: blur(2px);
   }
 
   .bubble span {
@@ -157,6 +164,7 @@ const StyledWrapper = styled.div`
     border-bottom: 10px solid #fff;
     filter: blur(8px);
     transform: rotate(330deg);
-  }`;
+  }
+`;
 
 export default Loader;

@@ -3,8 +3,10 @@ import { FaFacebook, FaTwitter, FaLinkedin, FaEnvelope, FaPhone, FaMapMarkerAlt 
 
 const Footer = () => {
   return (
-    <footer className="bg-gray-100 text-gray-700 py-8">
-      <div className="container mx-auto grid grid-cols-1 md:grid-cols-4 gap-8 px-4">
+    <footer className="bg-gray-100 text-gray-700 py-10 px-4 sm:px-8">
+
+<div className="max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10">
+
         {/* Contact Section */}
         <div>
           <h4 className="font-bold mb-4">Contact</h4>
