@@ -1,6 +1,5 @@
-import React, { useState } from "react"; // ✅ Add useState
+import React, { useState, useEffect } from "react"; // ✅ Add useState
 import { Routes, Route } from "react-router-dom";
-
 import SignUp from "./pages/Signup/index.jsx";
 import Login from "./pages/Login/index.jsx";
 import Editor from "./pages/Editor/index.jsx";
@@ -11,8 +10,15 @@ import Feedback from "./components/Feedback";
 import BusinessPlanPage from "./components/BusinessPlanPage";
 
 function App() {
-  const [isDark, setIsDark] = useState(false); // ✅ Theme state
-
+  const [isDark, setIsDark] = useState(false);
+  useEffect(() => {
+    const html = document.documentElement;
+    if (isDark) {
+      html.classList.add("dark");
+    } else {
+      html.classList.remove("dark");
+    }
+  }, [isDark]);
   return (
     <div className={isDark ? "dark" : ""}> {/* ✅ Toggle dark class */}
       <Routes>

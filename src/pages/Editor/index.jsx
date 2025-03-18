@@ -178,7 +178,7 @@ const EditorPage = () => {
       <div className="flex flex-1">
         <aside className="bg-gray-100 w-1/3 px-4 py-6 flex flex-col justify-between">
           <div>
-            <h2 className="text-lg font-bold text-black mb-6">AI Chatbot System</h2>
+            <h2 className="text-2xl font-bold text-black mb-6">Diagram Generator</h2>
             <div className="flex space-x-2 mb-6">
               {["♺ Recent", "+ New", "Chat", "<> Code"].map((tab) => (
                 <button

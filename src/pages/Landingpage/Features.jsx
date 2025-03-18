@@ -69,48 +69,50 @@ const features = [
 
 const Features = () => {
   return (
-    <section className="w-full py-20">
-      <h2 className="text-center text-red-700 font-extrabold text-5xl mb-16">
-        Features
-      </h2>
+    <div className="bg-white dark:bg-gray-600 dark:text-white text-black ">
+      <section className="w-full py-20">
+        <h2 className="text-center text-red-700 font-extrabold text-5xl mb-16">
+          Features
+        </h2>
 
-      {features.map((feature, index) => (
-        <div
-          key={feature.id}
-          className={`flex flex-col lg:flex-row items-center justify-between w-full py-20 gap-12 ${
-            index % 2 === 0 ? "lg:flex-row" : "lg:flex-row-reverse"
-          } ${feature.bgClass} ${feature.curveClass}`}
-        >
-          {/* Text Section */}
-          <div className="w-full lg:w-1/2 px-6 lg:px-20">
-            <div className="flex items-start gap-6">
-              {/* Big Number */}
-              <span className="text-5xl sm:text-6xl md:text-7xl lg:text-[90px] font-extrabold text-gray-400 leading-none">
+        {features.map((feature, index) => (
+          <div
+            key={feature.id}
+            className={` flex flex-col lg:flex-row items-center justify-between w-full py-20 gap-12 ${
+              index % 2 === 0 ? "lg:flex-row" : "lg:flex-row-reverse dark:bg-gray-500"
+            } ${feature.bgClass} ${feature.curveClass}`}
+          >
+            {/* Text Section */}
+            <div className="w-full lg:w-1/2 px-6 lg:px-20">
+              <div className="flex items-start gap-6">
+                {/* Big Number */}
+                <span className="text-5xl sm:text-6xl md:text-7xl lg:text-[90px] font-extrabold text-gray-400 leading-none">
 
-                {feature.id}
-              </span>
+                  {feature.id}
+                </span>
 
-              {/* Multi-line Description */}
-              <div className="text-black text-lg sm:text-xl md:text-2xl lg:text-[30px] font-semibold leading-snug space-y-2">
+                {/* Multi-line Description */}
+                <div className=" dark:text-gray-400 text-black text-lg sm:text-xl md:text-2xl lg:text-[25px] font-semibold leading-snug space-y-2">
 
-                {feature.title.split(",").map((line, i) => (
-                  <p key={i}>{line.trim()}</p>
-                ))}
+                  {feature.title.split(",").map((line, i) => (
+                    <p key={i}>{line.trim()}</p>
+                  ))}
+                </div>
               </div>
             </div>
-          </div>
 
-          {/* Image Section */}
-          <div className="w-full lg:w-1/2 px-6 lg:px-20">
-            <img
-              src={feature.image}
-              alt={feature.title}
-              className="w-[80%] max-w-[600px] h-auto mx-auto rounded-xl"
-            />
+            {/* Image Section */}
+            <div className="w-full lg:w-1/2 px-6 lg:px-20">
+              <img
+                src={feature.image}
+                alt={feature.title}
+                className="w-[80%] max-w-[600px] h-auto mx-auto rounded-xl"
+              />
+            </div>
           </div>
-        </div>
-      ))}
-    </section>
+        ))}
+      </section>
+    </div>
   );
 };
 

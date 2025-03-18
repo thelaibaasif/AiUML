@@ -6,9 +6,9 @@ import customization from "../../images/customization.png";
 
 const ElevateUML = () => {
   return (
-    <div className="bg-white py-32 w-full">
+    <div className="bg-white py-32 w-full dark:bg-gray-600">
       {/* Heading */}
-      <h2 className="text-center text-5xl md:text-6xl font-extrabold text-red-700">
+      <h2 className="text-center text-5xl md:text-5xl font-extrabold text-red-700">
         Elevate Your UML Experience
       </h2>
 
@@ -39,7 +39,7 @@ const ElevateUML = () => {
         }].map((feature, i) => (
           <div
             key={i}
-            className="flex flex-col items-center text-center border-2 border-red-500 rounded-2xl p-6 hover:shadow-md transition bg-white"
+            className="dark:bg-gray-500 dark:text-white flex flex-col items-center text-center border-2 border-red-500 rounded-2xl p-6 hover:shadow-md transition bg-white"
           >
             <img src={feature.img} alt={feature.title} className="w-24 h-24 mb-4" />
             <h3 className="text-2xl font-bold">{feature.title}</h3>

@@ -3,12 +3,12 @@ import { Link } from 'react-router-dom';
 import logo from '../../images/logo.png';
 import Illustration from '../../images/Illustration.png';
 import Switch from '../../components/DayNight';
-
+import logoDark from '../../images/logo_dark.png';
 const Header = ({ setIsDark }) => {
   return (
-    <div className="bg-white dark:bg-gray-900 w-full text-black dark:text-white">
+    <div className="bg-white dark:bg-gray-600 w-full text-black dark:text-white">
       {/* Navigation Header */}
-      <header className="shadow-md sticky top-0 z-50 w-full bg-white dark:bg-gray-800">
+      <header className="shadow-md sticky top-0 z-50 w-full bg-white dark:bg-gray-600">
       <div className="flex flex-col md:flex-row justify-between items-center px-6 md:px-12 py-4 space-y-4 md:space-y-0">
           {/* Logo & Day/Night Toggle */}
           <div className="flex items-center space-x-3 flex-wrap sm:flex-nowrap">
@@ -36,10 +36,12 @@ const Header = ({ setIsDark }) => {
         </div>
       </header>
 
+      
+
       {/* Hero Section */}
       <section
         id="home"
-        className="bg-light-blue dark:bg-gray-700 rounded-br-[200px] overflow-hidden w-full"
+        className="bg-light-blue dark:bg-gray-500 rounded-br-[200px] overflow-hidden w-full"
       >
         <div className="flex flex-col lg:flex-row items-center justify-between px-6 sm:px-10 lg:px-20 py-16 md:py-24 gap-10 md:gap-16 lg:gap-20 w-full">
           {/* Text Content */}

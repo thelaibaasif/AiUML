@@ -6,6 +6,8 @@ import { auth, db } from "../../firebase";
 import backgroundImage from "../../images/Login.png";
 import googleIcon from "../../images/google.png";
 import appleIcon from "../../images/apple.jpg";
+import GoBack from "../../components/GoBack";
+
 
 const Login = () => {
   const navigate = useNavigate();
@@ -14,7 +16,7 @@ const Login = () => {
   const [showModal, setShowModal] = useState(false);
   const [modalContent, setModalContent] = useState("");
   const [isAgreed, setIsAgreed] = useState(false);
-
+  
   const validateEmail = (email) =>
     /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 
@@ -102,12 +104,15 @@ const Login = () => {
 
   return (
     <div className="w-screen h-screen flex items-center justify-center bg-white">
+      
       <div className="flex flex-col md:flex-row w-[90%] md:w-full max-w-5xl h-auto md:h-[95%] shadow-md border rounded-lg overflow-hidden">
-
+      <div className="absolute top-4 left-4 z-10">
+    <GoBack onClick={() => navigate(-1)} />
+  </div>
         {/* Left Section */}
         <div className="w-full md:w-1/2 p-6 sm:p-10 flex flex-col justify-center">
-
-          <h1 className="text-2xl font-bold mb-2">Welcome back!</h1>
+      
+          <h1 className="text-4xl font-bold mb-2">Welcome back!</h1>
           <p className="text-sm text-gray-600 mb-4">
             Enter your Credentials to access your account
           </p>

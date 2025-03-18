@@ -7,6 +7,7 @@ import googleLogo from "../../images/icons8-google-1.svg";
 import appleLogo from "../../images/icons8-apple-logo-1.svg";
 import backgroundImg from "../../images/chris-lee-70l1tdai6rm-unsplash-1.png";
 import logoImg from "../../images/logo.png";
+import GoBack from "../../components/GoBack";
 
 const SignUp = () => {
   const navigate = useNavigate();
@@ -116,12 +117,14 @@ const SignUp = () => {
   return (
     <div className="flex justify-center items-center min-h-[85vh] bg-white w-full">
       <div className="flex flex-col md:flex-row bg-white shadow-md overflow-hidden rounded-lg w-[95%] max-w-6xl">
-
+      <div className="absolute top-4 left-4 z-10">
+    <GoBack onClick={() => navigate(-1)} />
+  </div>
 
         {/* Left Section */}
         <div className="w-full md:w-1/2 p-6 sm:p-10">
 
-          <h1 className="text-3xl font-bold mb-6 text-gray-800">Get Started Now</h1>
+          <h1 className="text-4xl font-bold mb-6 text-gray-800">Get Started Now</h1>
           <form onSubmit={handleSubmit}>
             {/* Name Input */}
             <div className="mb-4">
