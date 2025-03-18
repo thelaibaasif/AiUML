@@ -1,5 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import { auth } from "../../firebase"; // Import Firebase auth
+import { ref, push, set } from "firebase/database";
+import {  realTimeDb } from "../../firebase";
 import { signOut } from "firebase/auth";
 import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
@@ -54,7 +56,34 @@ const EditorPage = () => {
   const handleZoomIn = () => setZoomLevel((prev) => Math.min(prev + 0.1, 2));
   const handleZoomOut = () => setZoomLevel((prev) => Math.max(prev - 0.1, 0.5));
   const handleResetZoom = () => setZoomLevel(1);
-  
+  const sessionId = sessionStorage.getItem("sessionId");
+  const chatId = sessionStorage.getItem("chatId");
+  const [message, setMessage] = useState("");
+  //const [profileData, setProfileData] = useState(null);
+
+  /*
+   useEffect(() => {
+      const fetchUserData = async () => {
+        const user = auth.currentUser;
+        if (user) {
+          const userDocRef = doc(db, "users", user.uid);
+          const userDoc = await getDoc(userDocRef);
+    
+          if (userDoc.exists()) {
+            const userData = userDoc.data();
+            console.log("User data from Firestore:", userData);
+    
+            // Update state with user data
+            setProfileData(userData);
+          } else {
+            console.log("No user data found");
+          }
+        }
+      };
+    
+      fetchUserData();
+    }, []);*/
+
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (colorsRef.current && !colorsRef.current.contains(event.target)) {
@@ -145,6 +174,40 @@ const EditorPage = () => {
       console.error("Error processing the text:", error);
       setOutput("An error occurred. Please try again.");
     }
+  };
+
+  const sendMessage = async () => {
+    console.log("Send Message Triggered");
+    const user = auth.currentUser;
+    console.log("User:", user);
+  
+    if (user && sessionId && chatId && message.trim()) {
+      console.log("Session ID:", sessionId);
+      console.log("Chat ID:", chatId);
+      console.log("Message:", message);
+  
+      // Reference for storing messages
+      const messageRef = push(ref(realTimeDb, `chats/${user.uid}/${sessionId}/${chatId}`));
+      
+      // Store message
+      await set(messageRef, {
+        text: message,
+        sender: user.displayName || "Unknown",
+        timestamp: Date.now(),
+      })
+        .then(() => {
+          console.log("Message sent successfully!");
+          setMessage(""); // Clear input field
+        })
+        .catch((error) => console.error("Error sending message:", error));
+    } else {
+      console.log("Condition check failed — some values are missing.");
+    }
+  };
+  
+  const handleCombinedSubmit = async () => {
+    //await handleChatSubmit(); // Ensure state updates before sending
+    sendMessage(); // Then send message using updated state
   };
 
   // Fuction to handle signout
@@ -309,13 +372,17 @@ const EditorPage = () => {
         type="text"
         placeholder="Type here..."
         value={inputText}
-        onChange={(e) => setInputText(e.target.value)}
+        onChange={(e) => {
+          setInputText(e.target.value);
+          setMessage(e.target.value);
+          }
+        }
         className="flex-grow px-4 py-2 rounded-md border border-gray-300"
       />
     </div>
 
     <button
-      onClick={handleChatSubmit}
+      onClick={handleCombinedSubmit}
       disabled={isLoading}
       className={`w-full py-2 text-white rounded-md ${
         isLoading ? "opacity-50 cursor-not-allowed" : "bg-red-700 hover:bg-gray-800"
