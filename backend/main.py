@@ -5,7 +5,11 @@ from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 #from transformers import pipeline
 from gradio_client import Client
+import os
+from dotenv import load_dotenv
 
+load_dotenv()
+HF_TOKEN = os.getenv("HF_TOKEN")
 app = FastAPI()
 
 # Allow CORS for frontend connection
@@ -88,7 +92,7 @@ async def process_text(request: Request):
         #generated_code = result[0]["generated_text"]
 
         # Call the hosted API endpoint on Hugging Face Spaces via gradio_client
-        client = Client("vinzur/Prompt-to-PlantUML", hf_token="REVOKED_TOKEN")
+        client = Client("vinzur/Prompt-to-PlantUML", hf_token=HF_TOKEN)
         result = client.predict(query=text, api_name="/predict")
         generated_code = result
         
