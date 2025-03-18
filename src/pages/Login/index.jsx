@@ -18,16 +18,13 @@ const Login = () => {
   const [showModal, setShowModal] = useState(false);
   const [modalContent, setModalContent] = useState("");
   const [isAgreed, setIsAgreed] = useState(false);
-<<<<<<< HEAD
   
-=======
   const [sessionId, setSessionId] = useState(null);
   const newSessionId = useRef(null);
   const [chatId, setChatId] = useState(null);
   const newChatId = useRef(null);
 
 
->>>>>>> 010b6cda3cf464873a46049a60ebfc4596d79c2c
   const validateEmail = (email) =>
     /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 

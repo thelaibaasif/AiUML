@@ -16,17 +16,17 @@ const ConnectWithUs = () => {
               behind-the-scenes content. Let's stay connected!
             </p>
             {/* Social Icons */}
-            <div className="flex gap-6 text-2xl text-gray-600 dark:bg-gray-800">
-              <a href="#" aria-label="Discord" className="hover:text-red-700 transition">
+            <div className="flex gap-6 text-2xl text-gray-600 ">
+              <a href="#" aria-label="Discord" className="dark:bg-gray-800 hover:text-red-700 transition">
                 <FaDiscord />
               </a>
-              <a href="#" aria-label="Facebook" className="hover:text-red-700 transition">
+              <a href="#" aria-label="Facebook" className="dark:bg-gray-800 hover:text-red-700 transition">
                 <FaFacebookF />
               </a>
-              <a href="#" aria-label="Dribbble" className="hover:text-red-700 transition">
+              <a href="#" aria-label="Dribbble" className="dark:bg-gray-800 hover:text-red-700 transition">
                 <FaDribbble />
               </a>
-              <a href="#" aria-label="Instagram" className="hover:text-red-700 transition">
+              <a href="#" aria-label="Instagram" className="dark:bg-gray-800 hover:text-red-700 transition">
                 <FaInstagram />
               </a>
             </div>
