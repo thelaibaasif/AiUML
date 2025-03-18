@@ -1,8 +1,10 @@
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useRef, useState } from "react";
+import { createSession, useNavigate } from "react-router-dom";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { doc, getDoc } from "firebase/firestore";
 import { auth, db } from "../../firebase";
+import { ref, push, set } from "firebase/database";
+import {  realTimeDb } from "../../firebase";
 import backgroundImage from "../../images/Login.png";
 import googleIcon from "../../images/google.png";
 import appleIcon from "../../images/apple.jpg";
@@ -14,6 +16,11 @@ const Login = () => {
   const [showModal, setShowModal] = useState(false);
   const [modalContent, setModalContent] = useState("");
   const [isAgreed, setIsAgreed] = useState(false);
+  const [sessionId, setSessionId] = useState(null);
+  const newSessionId = useRef(null);
+  const [chatId, setChatId] = useState(null);
+  const newChatId = useRef(null);
+
 
   const validateEmail = (email) =>
     /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
@@ -61,9 +68,18 @@ const Login = () => {
         if (userDoc.exists()) {
           const userData = userDoc.data();
           console.log("User data from Firestore:", userData);
-
+          // Firestore session
           sessionStorage.setItem("user", JSON.stringify(userData));
+          
+          if (user) {
+            const testRef = push(ref(realTimeDb, `test/${user.uid}`));
+            set(testRef, { message: "Test message" })
+              .then(() => console.log("Test data written successfully"))
+              .catch((error) => console.error("Error writing test data:", error));
+          }
 
+          // Realtime Database Session creation
+          createSession();
         alert(`Welcome back, ${userData.name}!`);
         }
         alert("Login successful!");
@@ -75,6 +91,86 @@ const Login = () => {
       alert("Please fix the errors before submitting.");
     }
   };
+/*
+  
+  const createSession = async () => {
+    console.log("Creating Session...");
+    const user = auth.currentUser;
+    if (user) {
+      console.log("User ID:", user.uid);
+      console.log("Realtime DB Ref:", ref(realTimeDb, `chats/${user.uid}`));
+      const sessionRef = ref(realTimeDb, `chats/${user.uid}/test`);
+        push(sessionRef, {
+          test: "This is a test"
+        })
+          .then(() => console.log("Session written successfully"))
+          .catch((error) => console.error("Error writing session:", error));
+
+      console.log("Session Ref:", sessionRef);
+      console.log("Session Created:", sessionRef.key);
+      newSessionId.current = sessionRef?.key;
+      setSessionId(newSessionId.current);
+
+      if (sessionRef?.key) {
+        newSessionId.current = sessionRef.key;
+        setSessionId(newSessionId.current);
+        console.log("New Session ID Set:", newSessionId.current);
+      } else {
+        console.error("Session key is undefined!");
+      }
+    } else {
+      console.log("User not logged in.");
+    }
+  };*/
+
+  // Function for session creation in rrealtime db
+  const createSession = async () => {
+    console.log("Creating Session...");
+    const user = auth.currentUser;
+    if (user) {
+      console.log("User ID:", user.uid);
+      const sessionRef = push(ref(realTimeDb, `chats/${user.uid}`)); // Create a new session reference
+      console.log("Session Ref:", sessionRef);
+      
+      await set(sessionRef, { createdAt: Date.now() })
+        .then(async () => {
+          console.log("Session Created:", sessionRef.key);
+          newSessionId.current = sessionRef.key;
+          setSessionId(newSessionId.current);
+          console.log("New Session ID Set:", newSessionId.current);
+          // Storing the session id in storage for use in editor page through get function
+          sessionStorage.setItem("sessionId", newSessionId.current);
+
+          await createChat(newSessionId.current);
+        })
+        .catch((error) => console.error("Error setting session data:", error));
+    } else {
+      console.log("User not logged in.");
+    }
+  };
+  
+
+  // Creating/ Initializing the chat node under newly created session
+      const createChat = async (sessionId) => {
+        console.log("Creating Chat...");
+        const user = auth.currentUser;
+        if (user && sessionId) {
+          const chatRef = push(ref(realTimeDb, `chats/${user.uid}/${sessionId}`));
+          
+          await set(chatRef, { createdAt: Date.now() })
+            .then(() => {
+              console.log("Chat Created:", chatRef.key);
+              newChatId.current = chatRef.key;
+              setChatId(newChatId.current);
+              console.log("New Chat ID Set:", newChatId.current);
+              // Storing the chat id in storage for use in editor page through get function
+              sessionStorage.setItem("chatId", newChatId.current);
+            })
+            .catch((error) => console.error("Error setting chat data:", error));
+        } else {
+          console.log("User/session info missing");
+        }
+      };
 
   const handleSignInClick = (type) => {
     setModalContent(

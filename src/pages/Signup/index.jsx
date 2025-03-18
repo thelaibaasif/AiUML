@@ -1,8 +1,10 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { doc, setDoc } from "firebase/firestore";
 import { auth, db } from "../../firebase";
+import { ref, push, set } from "firebase/database";
+import {  realTimeDb } from "../../firebase";
 import googleLogo from "../../images/icons8-google-1.svg";
 import appleLogo from "../../images/icons8-apple-logo-1.svg";
 import backgroundImg from "../../images/chris-lee-70l1tdai6rm-unsplash-1.png";
@@ -23,6 +25,10 @@ const SignUp = () => {
   const [showModal, setShowModal] = useState(false);
   const [modalContent, setModalContent] = useState("");
   const [isAgreed, setIsAgreed] = useState(false);
+  const [sessionId, setSessionId] = useState(null);
+  const [chatId, setChatId] = useState(null);
+  const newSessionId = useRef(null);
+  const newChatId = useRef(null);
 
   const validateName = (name) => name.trim().length > 2;
   const validateEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
@@ -61,38 +67,86 @@ const SignUp = () => {
     e.preventDefault();
     if (validateName(formData.name) && validateEmail(formData.email) && validatePassword(formData.password)) {
       try {
-        await createUserWithEmailAndPassword(auth, formData.email, formData.password);
+        console.log("Attempting to create user...");
+        const userCredentials = await createUserWithEmailAndPassword(auth, formData.email, formData.password);
+  
+        const user = userCredentials.user;
+        console.log("User created:", user);
+  
+        await setDoc(doc(db, "users", user.uid), {
+          name: formData.name,
+          email: formData.email,
+          createdAt: new Date()
+        });
+  
+  
+        console.log("User registered with UID:", user.uid);
+  
+        // Creating session for storage in realtime db
+        createSession(); 
+  
         alert("Signup successful!");
         navigate("/EnhancedEditor");
+  
       } catch (err) {
+        console.error("Signup failed:", err.message);
         alert(err.message);
       }
+  
     } else {
       alert("Please fix the errors before submitting.");
     }
 
-    try {
-      const userCredentials = await createUserWithEmailAndPassword(auth, formData.email, formData.password);
-
-      const user = userCredentials.user;
-
-      await setDoc(doc(db, "users", user.uid), {
-        name: formData.name,
-        email: formData.email,
-        createdAt: new Date()
-      });
-
-
-      console.log("User registered with UID:", user.uid);
-
-      alert("Signup successful!");
-      navigate("/EnhancedEditor");
-
-    } catch (err) {
-      setErrors(err.message);
-    }
-
+   
   };
+
+  // Function for session creation in rrealtime db
+    const createSession = async () => {
+      console.log("Creating Session...");
+      const user = auth.currentUser;
+      if (user) {
+        console.log("User ID:", user.uid);
+        const sessionRef = push(ref(realTimeDb, `chats/${user.uid}`)); // Create a new session reference
+        console.log("Session Ref:", sessionRef);
+        
+        await set(sessionRef, { createdAt: Date.now() })
+          .then(async () => {
+            console.log("Session Created:", sessionRef.key);
+            newSessionId.current = sessionRef.key;
+            setSessionId(newSessionId.current);
+            console.log("New Session ID Set:", newSessionId.current);
+            // Storing the session id in storage for use in editor page through get function
+            sessionStorage.setItem("sessionId", newSessionId.current);
+
+            await createChat(newSessionId.current);
+          })
+          .catch((error) => console.error("Error setting session data:", error));
+      } else {
+        console.log("User not logged in.");
+      }
+    };
+
+    // Creating/ Initializing the chat node under newly created session
+    const createChat = async (sessionId) => {
+      console.log("Creating Chat...");
+      const user = auth.currentUser;
+      if (user && sessionId) {
+        const chatRef = push(ref(realTimeDb, `chats/${user.uid}/${sessionId}`));
+        
+        await set(chatRef, { createdAt: Date.now() })
+          .then(() => {
+            console.log("Chat Created:", chatRef.key);
+            newChatId.current = chatRef.key;
+            setChatId(newChatId.current);
+            console.log("New Chat ID Set:", newChatId.current);
+            // Storing the chat id in storage for use in editor page through get function
+            sessionStorage.setItem("chatId", newChatId.current);
+          })
+          .catch((error) => console.error("Error setting chat data:", error));
+      } else {
+        console.log("User/session info missing");
+      }
+    };
 
   const handleSignInClick = (type) => {
     setModalContent(type === "google" ? "Allow Google to sign you in to this app." : "Allow Apple to sign you in to this app.");
