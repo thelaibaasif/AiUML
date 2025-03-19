@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
-import { auth } from "../../firebase"; // Import Firebase auth
-import { ref, push, set } from "firebase/database";
+import { auth, db } from "../../firebase"; // Import Firebase auth
+import { doc, getDoc } from "firebase/firestore";
+import { ref, push, set, update } from "firebase/database";
 import {  realTimeDb } from "../../firebase";
 import { signOut } from "firebase/auth";
 import { useNavigate } from "react-router-dom";
@@ -59,9 +60,11 @@ const EditorPage = () => {
   const sessionId = sessionStorage.getItem("sessionId");
   const chatId = sessionStorage.getItem("chatId");
   const [message, setMessage] = useState("");
-  //const [profileData, setProfileData] = useState(null);
+  const [profileData, setProfileData] = useState(null);
+  
 
-  /*
+
+  
    useEffect(() => {
       const fetchUserData = async () => {
         const user = auth.currentUser;
@@ -82,7 +85,7 @@ const EditorPage = () => {
       };
     
       fetchUserData();
-    }, []);*/
+    }, []);
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -101,7 +104,7 @@ const EditorPage = () => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
   
-  const handleSaveProject = () => {
+  const handleSaveProject = async () => {
     const diagramState = {
       diagram: activeDiagram,
       zoom: zoomLevel,
@@ -109,7 +112,12 @@ const EditorPage = () => {
     };
   
     localStorage.setItem("savedDiagramState", JSON.stringify(diagramState));
-    alert("Diagram state saved successfully!");
+    if (output) {
+      await saveCode();
+      alert("Diagram state and generated code saved successfully!");
+    } else {
+      alert("No generated code to save.");
+    }
   };
   const getButtonClass = (label) => {
     return `${
@@ -150,13 +158,13 @@ const EditorPage = () => {
    // Function to handle submission
    const handleSubmit = async () => {
     if (!inputText.trim()) return; // Avoid empty submissions
-    try {
-      const response = await fetch("http://localhost:8000/process", {
+   try {
+     const response = await fetch("http://localhost:8000/process", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ text: inputText }),
+        body: JSON.stringify({ text: inputText, skip_model: false }),
       });
       const data = await response.json();
       console.log("Full Response:", JSON.stringify(data));
@@ -164,12 +172,27 @@ const EditorPage = () => {
       if(aceEditorRef.current) {
         aceEditorRef.current.editor.setValue(data.generated_code);
       }
-      //output = data.generated_code;
-      setActiveDiagram((prev) => ({
-        ...prev,
-        image: data.diagram_url,
-        name: "Generated Diagram", 
-      }));
+
+      setOutput(data.generated_code);
+            setActiveDiagram((prev) => ({
+              ...prev,
+              image: data.diagram_url,
+              name: "Generated Diagram", 
+            }));
+     
+        // const fakeResponse = {
+        //   generated_code: "class Diagram { \n  constructor() { }\n}",
+        //   diagram_url: "https://example.com/fake-diagram.png",
+        // };
+        // if(aceEditorRef.current) {
+        //   aceEditorRef.current.editor.setValue(fakeResponse.generated_code);
+        // }
+        // setActiveDiagram((prev) => ({
+        //   ...prev,
+        //   image: fakeResponse.diagram_url,
+        //   name: "Generated Diagram", 
+        // }));
+
     } catch (error) {
       console.error("Error processing the text:", error);
       setOutput("An error occurred. Please try again.");
@@ -192,7 +215,7 @@ const EditorPage = () => {
       // Store message
       await set(messageRef, {
         text: message,
-        sender: user.displayName || "Unknown",
+        sender: profileData.name || "Unknown",
         timestamp: Date.now(),
       })
         .then(() => {
@@ -204,11 +227,160 @@ const EditorPage = () => {
       console.log("Condition check failed — some values are missing.");
     }
   };
+
+  const saveEditedCode = async() => {
+    try {
+      if (!output.trim()) return;
+
+      console.log("Sending edited code...");
+
+      const response = await fetch("http://localhost:8000/process", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ text: output, skip_model: true }), // Skip model when editing
+      });
+
+      const data = await response.json();
+
+      if (data.generated_code) {
+        console.log("Edited Code Saved:", data.generated_code);
+
+        //  Update chat in Realtime Database
+        const user = auth.currentUser;
+        const sessionId = sessionStorage.getItem("sessionId");
+        const chatId = sessionStorage.getItem("chatId");
+        const messageId = sessionStorage.getItem("messageId");
+        if (user && sessionId && chatId && messageId) {
+          const existingMessageRef = ref(realTimeDb, `chats/${user.uid}/${sessionId}/${chatId}/${messageId}`);
+          await set(existingMessageRef, {
+            text: data.generated_code,
+            sender: "AiUML",
+            timestamp: Date.now(),
+          });
+
+          console.log("Updated code saved to DB");
+
+          //  Update frontend state
+          setOutput(data.generated_code);
+          setActiveDiagram((prev) => ({
+            ...prev,
+            image: data.diagram_url,
+            name: "Updated Diagram",
+          }));
+        } else {
+          console.error("Missing user, session, or chat ID");
+        }
+      }
+    } catch (error) {
+      console.error("Error updating code:", error);
+    }
+  };
   
   const handleCombinedSubmit = async () => {
-    //await handleChatSubmit(); // Ensure state updates before sending
-    sendMessage(); // Then send message using updated state
+    if (activeTab === "Chat") {
+      console.log("Submitting new message...");
+      await sendMessage(); // Then send message using updated state
+    handleChatSubmit(); // Ensure state updates before sending
+    } else if (activeTab === "<> Code") {
+      console.log("Saving edited code...");
+      saveEditedCode();
+    }
   };
+
+  const saveCode = async () => {
+    const user = auth.currentUser;
+    if (user && sessionId && chatId && output) {
+      const messageRef = ref(realTimeDb, `chats/${user.uid}/${sessionId}/${chatId}`);
+      const newMessageRef = push(messageRef);
+      const messageId = newMessageRef.key;
+      await set(newMessageRef, {
+        text: output, // Saving the code here
+        sender: "AiUML",
+        timestamp: Date.now(),
+      });
+      sessionStorage.setItem("messageId", messageId);
+      console.log("Generated code saved:", output);
+    }
+  };
+  
+
+  const handleExport = async (format) => {
+    if (format === "png") {
+      // Directly download the PNG (this works fine)
+      const link = document.createElement("a");
+      link.href = activeDiagram.image;
+      link.download = "diagram.png";
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    } else if (format === "svg") {
+      // Get the SVG element (if it's rendered in the DOM)
+      const svgElement = document.querySelector("svg"); // Make sure the SVG is present in the DOM
+      if (svgElement) {
+        const serializer = new XMLSerializer();
+        console.log(new XMLSerializer().serializeToString(svgElement));
+        const svgBlob = new Blob([serializer.serializeToString(svgElement)], {
+          type: "image/svg+xml;charset=utf-8",
+        });
+        const url = URL.createObjectURL(svgBlob);
+
+        // Force download
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = "diagram.svg";
+        document.body.appendChild(link);
+        link.click();
+
+        // Cleanup
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+      } else {
+        console.error("SVG element not found.");
+      }
+    }
+
+     /* if (activeDiagram.image) {
+        try {
+          const response = await fetch(activeDiagram.image); // Fetch the image content
+          if (!response.ok) throw new Error("Failed to fetch image");
+    
+          const blob = await response.blob(); // Convert to blob
+          const url = URL.createObjectURL(blob);
+    
+          const link = document.createElement("a");
+          link.href = url;
+          link.download = `diagram.${format}`;
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+    
+          URL.revokeObjectURL(url); // Clean up memory
+        } catch (error) {
+          console.error(`Error downloading ${format} file:`, error);
+        }
+      }*/
+  };
+
+  const createNewChat = async () => {
+    console.log("Creating New Chat...");
+    const user = auth.currentUser;
+    if (user && sessionId) {
+      const chatRef = push(ref(realTimeDb, `chats/${user.uid}/${sessionId}`));
+      await set(chatRef, {
+        createdAt: Date.now(),
+      });
+      console.log("Chat Created:", chatRef.key);
+  
+      // Store the new chat ID in session storage
+      sessionStorage.setItem("chatId", chatRef.key);
+      console.log("New Chat ID Set:", chatRef.key);
+    } else {
+      console.log("User or session missing");
+    }
+  };
+  
 
   // Fuction to handle signout
   const handleSignOut = async () => {
@@ -251,7 +423,8 @@ const EditorPage = () => {
                       setChatMessages([]);   // clear previous messages
                       setInputText("");      // reset input
                       setActiveTab("Chat");  // switch to Code tab
-                      //setActiveTab("Code");  
+                      //setActiveTab("Code");
+                      createNewChat();  
                     } else {
                       setActiveTab(tab);     // normal tab switch
                     }
@@ -538,21 +711,22 @@ const EditorPage = () => {
           <div className="bg-white rounded-md shadow-md p-6 w-1/3">
             <h3 className="text-lg font-bold mb-4 text-center">Export Options</h3>
             <div className="flex flex-col items-center">
-            <a
-  href={activeDiagram.image}
-  download="diagram.svg"
-  className="border border-gray-500 px-6 py-2 rounded-md text-gray-700 mb-4 hover:bg-gray-100 text-center"
->
-  Download SVG
-</a>
+           
+            {/* PNG Export */}
+            <button
+                onClick={() => handleExport("png")}
+                className="border border-gray-500 px-6 py-2 rounded-md text-gray-700 mb-4 hover:bg-gray-100 text-center"
+              >
+                Download PNG
+            </button>
 
-<a
-  href={activeDiagram.image}
-  download="diagram.png"
-  className="border border-gray-500 px-6 py-2 rounded-md text-gray-700 mb-4 hover:bg-gray-100 text-center"
->
-  Download PNG
-</a>
+            {/* SVG Export */}
+              <button
+                onClick={() => handleExport("svg")}
+                className="border border-gray-500 px-6 py-2 rounded-md text-gray-700 mb-4 hover:bg-gray-100 text-center"
+              >
+                Download SVG
+            </button>
 
               <div className="flex items-center space-x-4">
                 <label>
