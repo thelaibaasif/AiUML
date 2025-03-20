@@ -166,7 +166,7 @@ const EditorPage = () => {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ text: inputText, skip_model: false }),
+        body: JSON.stringify({ text: inputText, skip_model: false, diagram_type: activeDiagram.name }),
       });
       const data = await response.json();
       console.log("Full Response:", JSON.stringify(data));
@@ -241,7 +241,7 @@ const EditorPage = () => {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ text: output, skip_model: true }), // Skip model when editing
+        body: JSON.stringify({ text: output, skip_model: true, diagram_type: activeDiagram.name }), // Skip model when editing
       });
 
       const data = await response.json();
@@ -285,7 +285,7 @@ const EditorPage = () => {
       console.log("Submitting new message...");
       await sendMessage(); // Then send message using updated state
     handleChatSubmit(); // Ensure state updates before sending
-    } else if (activeTab === "<> Code") {
+    } else if (activeTab === "Code") {
       console.log("Saving edited code...");
       saveEditedCode();
     }
@@ -308,62 +308,36 @@ const EditorPage = () => {
   };
   
 
-  const handleExport = async (format) => {
-    if (format === "png") {
-      // Directly download the PNG (this works fine)
-      const link = document.createElement("a");
-      link.href = activeDiagram.image;
-      link.download = "diagram.png";
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-    } else if (format === "svg") {
-      // Get the SVG element (if it's rendered in the DOM)
-      const svgElement = document.querySelector("svg"); // Make sure the SVG is present in the DOM
-      if (svgElement) {
-        const serializer = new XMLSerializer();
-        console.log(new XMLSerializer().serializeToString(svgElement));
-        const svgBlob = new Blob([serializer.serializeToString(svgElement)], {
-          type: "image/svg+xml;charset=utf-8",
-        });
-        const url = URL.createObjectURL(svgBlob);
+const handleExport = async (format) => {
+  if (!activeDiagram?.image) {
+    console.error("No diagram to export.");
+    return;
+  }
+  const testimage = "https://www.plantuml.com/plantuml/svg/dLF1hjem4BpxAtphAOVU4IAGegBIj4hu0ITP4PV4ZjPhA4BzzygEOndAeNgNnBEhyOp7wuqXWTJse1WeadJdts5i0Fc3SSu3E1HyjRh0VRtsnRek_NylqL0fHl3eA1Am4-DaJTvr2CRuobSzGef_zbf1QTtsYPBfvNIwJyics7tvFKaK9BKg1CtbWybRabTWVzZYUQlr9JW-rDlooUr9qZ0JSqkzdjLgs_o2bd84uN41faKvEPqWhRPm14L1iHAOwXsrK47FBPDyNaBRVmkrO2lYNG_jHLkAfoein7K5P34zy8yhO6UV7CW61Sfe8-8NB_56AZsa_9qWCUXpO0UKSbFF7qmoaQjWbAgBOxN0_mYkr2JRD1e5Dp4uxBP76FnmkBdXZKRKDyCV_tH6eSGPtdNQ-UJlMj8Okt0-yIff6HOUILPcYofRrBFFcHyAvZuUkUbayO8yAHXwgIvcc6DuQgYaWi4Nypyl5-DaR0EgSu_vBm00";
+  const exportUrl = testimage.replace("/svg/", `/${format}/`);
 
-        // Force download
-        const link = document.createElement("a");
-        link.href = url;
-        link.download = "diagram.svg";
-        document.body.appendChild(link);
-        link.click();
+  //const exportUrl = activeDiagram.image.replace("/svg/", `/${format}/`);
 
-        // Cleanup
-        document.body.removeChild(link);
-        URL.revokeObjectURL(url);
-      } else {
-        console.error("SVG element not found.");
-      }
-    }
+  try {
+    const response = await fetch(exportUrl);
+    if (!response.ok) throw new Error(`Failed to fetch image: ${response.statusText}`);
 
-     /* if (activeDiagram.image) {
-        try {
-          const response = await fetch(activeDiagram.image); // Fetch the image content
-          if (!response.ok) throw new Error("Failed to fetch image");
-    
-          const blob = await response.blob(); // Convert to blob
-          const url = URL.createObjectURL(blob);
-    
-          const link = document.createElement("a");
-          link.href = url;
-          link.download = `diagram.${format}`;
-          document.body.appendChild(link);
-          link.click();
-          document.body.removeChild(link);
-    
-          URL.revokeObjectURL(url); // Clean up memory
-        } catch (error) {
-          console.error(`Error downloading ${format} file:`, error);
-        }
-      }*/
-  };
+    const blob = await response.blob(); 
+  
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.download = `diagram.${format}`; // Extension set dynamically
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+
+    URL.revokeObjectURL(link.href);
+    console.log(`${format.toUpperCase()} exported successfully.`);
+  } catch (error) {
+    console.error(`Failed to export ${format}:`, error);
+  }
+};
+
 
   const createNewChat = async () => {
     console.log("Creating New Chat...");
@@ -383,6 +357,60 @@ const EditorPage = () => {
     }
   };
   
+  const enhanceDiagram = async () => {
+    if (!output) {
+      console.log("No diagram to enhance");
+      return;
+    }
+  
+    console.log("Enhancing diagram...");
+  
+    try {
+      const response = await fetch("http://localhost:8000/enhance", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ code: output, diagram_type: activeDiagram.name }),
+      });
+  
+      const data = await response.json();
+
+      //  Update chat in Realtime Database
+      const user = auth.currentUser;
+      const sessionId = sessionStorage.getItem("sessionId");
+      const chatId = sessionStorage.getItem("chatId");
+      const messageId = sessionStorage.getItem("messageId");
+      if (user && sessionId && chatId && messageId) {
+        const existingMessageRef = ref(realTimeDb, `chats/${user.uid}/${sessionId}/${chatId}/${messageId}`);
+        await set(existingMessageRef, {
+          text: data.enhanced_code,
+          sender: "AiUML",
+          timestamp: Date.now(),
+        });
+
+        console.log("Updated code saved to DB");
+  
+      if (data.enhanced_code) {
+        setOutput(data.enhanced_code);
+        const newUrl = data.diagram_url;
+        setActiveDiagram((prev) => ({
+          ...prev,
+          image: newUrl,
+          name: "Enhanced Diagram",
+        }));
+      } else {
+        console.error("Missing user, session, or chat ID");
+      }
+  
+        console.log("Enhanced code saved:", data.enhanced_code);
+      } else {
+        console.error("Error enhancing diagram:", data.error);
+      }
+    } catch (error) {
+      console.error("Error enhancing diagram:", error);
+    }
+  };
 
   // Fuction to handle signout
   const handleSignOut = async () => {
@@ -515,6 +543,12 @@ const EditorPage = () => {
                       setChatMessages([]);   // clear previous messages
                       setInputText("");      // reset input
                       setActiveTab("Chat");  // switch to Code tab
+                      setOutput("");
+                      setActiveDiagram((prev) => ({
+                        ...prev,
+                        image: classDiagram,
+                        name: "Class Diagram",
+                      }));
                       //setActiveTab("Code");
                       createNewChat();  
                     } else {
@@ -916,7 +950,7 @@ const EditorPage = () => {
 
             {/* Insert EditWithAI Button here */}
             <div className="flex items-center">
-              <EditWithAI />
+            <EditWithAI onEnhance={enhanceDiagram} />
             </div>
             
             <button
@@ -976,21 +1010,18 @@ const EditorPage = () => {
           <div className="bg-white rounded-md shadow-md p-6 w-1/3">
             <h3 className="text-lg font-bold mb-4 text-center">Export Options</h3>
             <div className="flex flex-col items-center">
-            <a
-  href={activeDiagram.image}
-  download="diagram.svg"
-  className="border border-gray-500 px-6 py-2 rounded-md text-gray-700 mb-4 hover:bg-gray-100 text-center"
->
-  Download SVG
-</a>
-
-<a
-  href={activeDiagram.image}
-  download="diagram.png"
-  className="border border-gray-500 px-6 py-2 rounded-md text-gray-700 mb-4 hover:bg-gray-100 text-center"
->
-  Download PNG
-</a>
+            <button
+          onClick={() => handleExport("svg")}
+          className="border border-gray-500 px-6 py-2 rounded-md text-gray-700 mb-4 hover:bg-gray-100 text-center"
+        >
+          Download SVG
+        </button>
+        <button
+          onClick={() => handleExport("png")}
+          className="border border-gray-500 px-6 py-2 rounded-md text-gray-700 mb-4 hover:bg-gray-100 text-center"
+        >
+          Download PNG
+        </button>
 
               <div className="flex items-center space-x-4">
                 <label>
