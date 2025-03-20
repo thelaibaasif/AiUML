@@ -9,6 +9,9 @@ import Profile from "./components/Profile";
 import Feedback from "./components/Feedback";
 import BusinessPlanPage from "./components/BusinessPlanPage";
 
+
+
+
 function App() {
   const [isDark, setIsDark] = useState(false);
   useEffect(() => {
@@ -30,6 +33,7 @@ function App() {
         <Route path="/profile" element={<Profile />} />
         <Route path="/plans" element={<BusinessPlanPage />} />
         <Route path="/" element={<LandingPage setIsDark={setIsDark} />} /> {/* ✅ Pass setter */}
+        <Route path="/profile" element={<Profile />} />
       </Routes>
     </div>
   );
