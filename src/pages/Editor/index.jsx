@@ -1,13 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
-<<<<<<< HEAD
-import { Route } from "react-router-dom";
-import { auth } from "../../firebase"; // Import Firebase auth
-import { ref, push, set } from "firebase/database";
-=======
 import { auth, db } from "../../firebase"; // Import Firebase auth
 import { doc, getDoc } from "firebase/firestore";
 import { ref, push, set, update } from "firebase/database";
->>>>>>> 7b3eb15f2e9c4b24a760d8005266af60ae4dce37
 import {  realTimeDb } from "../../firebase";
 import { signOut } from "firebase/auth";
 import { useNavigate } from "react-router-dom";
@@ -982,22 +976,21 @@ const EditorPage = () => {
           <div className="bg-white rounded-md shadow-md p-6 w-1/3">
             <h3 className="text-lg font-bold mb-4 text-center">Export Options</h3>
             <div className="flex flex-col items-center">
-           
-            {/* PNG Export */}
-            <button
-                onClick={() => handleExport("png")}
-                className="border border-gray-500 px-6 py-2 rounded-md text-gray-700 mb-4 hover:bg-gray-100 text-center"
-              >
-                Download PNG
-            </button>
+            <a
+  href={activeDiagram.image}
+  download="diagram.svg"
+  className="border border-gray-500 px-6 py-2 rounded-md text-gray-700 mb-4 hover:bg-gray-100 text-center"
+>
+  Download SVG
+</a>
 
-            {/* SVG Export */}
-              <button
-                onClick={() => handleExport("svg")}
-                className="border border-gray-500 px-6 py-2 rounded-md text-gray-700 mb-4 hover:bg-gray-100 text-center"
-              >
-                Download SVG
-            </button>
+<a
+  href={activeDiagram.image}
+  download="diagram.png"
+  className="border border-gray-500 px-6 py-2 rounded-md text-gray-700 mb-4 hover:bg-gray-100 text-center"
+>
+  Download PNG
+</a>
 
               <div className="flex items-center space-x-4">
                 <label>

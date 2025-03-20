@@ -7,7 +7,7 @@ const plans = [
     name: "Free",
     price: "$0",
     features: [
-      "1 diagram/day",
+      "3 diagram/day",
       "Basic diagram types",
       "Limited AI enhancement",
     ],
@@ -18,7 +18,7 @@ const plans = [
     name: "Basic",
     price: "$5/mo",
     features: [
-      "3 diagrams/day",
+      "5 diagrams/day",
       "Priority processing",
       "Email support",
     ],
@@ -29,7 +29,7 @@ const plans = [
     name: "Pro",
     price: "$10/mo",
     features: [
-      "6 diagrams/day",
+      "10 diagrams/day",
       "Advanced AI suggestions",
       "Downloadable exports (PNG, SVG)",
     ],
