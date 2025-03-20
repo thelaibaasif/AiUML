@@ -81,26 +81,31 @@ def generate_plantuml_url(uml_text):
 async def process_text(request: Request):
     data = await request.json()
     text = data.get("text", "")
+    skip_model = data.get("skip_model", False)  # New flag
+
     print("Input:", text)
+    print("Skip model:", skip_model)
+
     if not text:
         return {"result": "No input provided."}
-    
+
     try:
         print("Processing the request...")
-        # Generate PlantUML code using the model
-        #result = pipe(text)
-        #generated_code = result[0]["generated_text"]
 
-        # Call the hosted API endpoint on Hugging Face Spaces via gradio_client
-        client = Client("vinzur/Prompt-to-PlantUML", hf_token=HF_TOKEN)
-        result = client.predict(query=text, api_name="/predict")
-        generated_code = result
-        
-        print("Generated PlantUML Code:", generated_code)
+        if skip_model:
+            #  Skip the model and directly encode the edited code
+            generated_code = text
+        else:
+            #  Pass through the model for user-generated prompts
+            client = Client("vinzur/Prompt-to-PlantUML", hf_token=HF_TOKEN)
+            result = client.predict(query=text, api_name="/predict")
+            generated_code = result
 
         # Encode the generated code for PlantUML rendering
         diagram_url = generate_plantuml_url(generated_code)
-        
+
+        print("Generated PlantUML Code:", generated_code)
+        print("Diagram URL:", diagram_url)
 
         return {
             "generated_code": generated_code,
