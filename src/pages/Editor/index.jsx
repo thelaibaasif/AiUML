@@ -200,6 +200,11 @@ const EditorPage = ({isGuest}) => {
     localStorage.setItem("savedDiagramState", JSON.stringify(diagramState));
     if (output) {
       await saveCode();
+      setActiveDiagram((prev) => ({
+        ...prev,
+        image: activeDiagram.image,
+        name: activeDiagram.name,
+      }));
       alert("Diagram state and generated code saved successfully!");
     } else {
       alert("No generated code to save.");
@@ -263,7 +268,7 @@ const EditorPage = ({isGuest}) => {
             setActiveDiagram((prev) => ({
               ...prev,
               image: data.diagram_url,
-              name: "Generated Diagram", 
+              name: activeDiagram.name, 
             }));
      
         // const fakeResponse = {
@@ -353,7 +358,7 @@ const EditorPage = ({isGuest}) => {
           setActiveDiagram((prev) => ({
             ...prev,
             image: data.diagram_url,
-            name: "Updated Diagram",
+            name: activeDiagram.name,
           }));
         } else {
           console.error("Missing user, session, or chat ID");
@@ -397,10 +402,10 @@ const handleExport = async (format) => {
     console.error("No diagram to export.");
     return;
   }
-  const testimage = "https://www.plantuml.com/plantuml/svg/dLF1hjem4BpxAtphAOVU4IAGegBIj4hu0ITP4PV4ZjPhA4BzzygEOndAeNgNnBEhyOp7wuqXWTJse1WeadJdts5i0Fc3SSu3E1HyjRh0VRtsnRek_NylqL0fHl3eA1Am4-DaJTvr2CRuobSzGef_zbf1QTtsYPBfvNIwJyics7tvFKaK9BKg1CtbWybRabTWVzZYUQlr9JW-rDlooUr9qZ0JSqkzdjLgs_o2bd84uN41faKvEPqWhRPm14L1iHAOwXsrK47FBPDyNaBRVmkrO2lYNG_jHLkAfoein7K5P34zy8yhO6UV7CW61Sfe8-8NB_56AZsa_9qWCUXpO0UKSbFF7qmoaQjWbAgBOxN0_mYkr2JRD1e5Dp4uxBP76FnmkBdXZKRKDyCV_tH6eSGPtdNQ-UJlMj8Okt0-yIff6HOUILPcYofRrBFFcHyAvZuUkUbayO8yAHXwgIvcc6DuQgYaWi4Nypyl5-DaR0EgSu_vBm00";
-  const exportUrl = testimage.replace("/svg/", `/${format}/`);
+  // const testimage = "https://www.plantuml.com/plantuml/svg/dLF1hjem4BpxAtphAOVU4IAGegBIj4hu0ITP4PV4ZjPhA4BzzygEOndAeNgNnBEhyOp7wuqXWTJse1WeadJdts5i0Fc3SSu3E1HyjRh0VRtsnRek_NylqL0fHl3eA1Am4-DaJTvr2CRuobSzGef_zbf1QTtsYPBfvNIwJyics7tvFKaK9BKg1CtbWybRabTWVzZYUQlr9JW-rDlooUr9qZ0JSqkzdjLgs_o2bd84uN41faKvEPqWhRPm14L1iHAOwXsrK47FBPDyNaBRVmkrO2lYNG_jHLkAfoein7K5P34zy8yhO6UV7CW61Sfe8-8NB_56AZsa_9qWCUXpO0UKSbFF7qmoaQjWbAgBOxN0_mYkr2JRD1e5Dp4uxBP76FnmkBdXZKRKDyCV_tH6eSGPtdNQ-UJlMj8Okt0-yIff6HOUILPcYofRrBFFcHyAvZuUkUbayO8yAHXwgIvcc6DuQgYaWi4Nypyl5-DaR0EgSu_vBm00";
+  // const exportUrl = testimage.replace("/svg/", `/${format}/`);
 
-  //const exportUrl = activeDiagram.image.replace("/svg/", `/${format}/`);
+  const exportUrl = activeDiagram.image.replace("/svg/", `/${format}/`);
 
   try {
     const response = await fetch(exportUrl);
@@ -481,7 +486,7 @@ const handleExport = async (format) => {
         setActiveDiagram((prev) => ({
           ...prev,
           image: newUrl,
-          name: "Enhanced Diagram",
+          name: activeDiagram.name,
         }));
       } else {
         console.error("Missing user, session, or chat ID");

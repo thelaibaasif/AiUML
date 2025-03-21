@@ -83,27 +83,7 @@ def generate_plantuml_url(uml_text):
 
 def optimize_use_case_diagram(diagram_text):
     """
-    Optimizes a use case diagram in PlantUML.
-
-    - Within the rectangle block containing the usecase definitions, if a usecase's description
-      contains "Browse" (case-insensitive) and no sub–usecases exist for it, insert:
-          usecase "Browse by type" as <alias>A
-          usecase "Browse by <<add metric>>" as <alias>B
-    - Similarly, if a usecase's description contains "Manage" and no sub–usecases exist, insert:
-          usecase "Add" as <alias>A
-          usecase "Update" as <alias>B
-          usecase "Delete" as <alias>C
-    - Then, in the relationship section (after the block), for each relationship line referencing
-      a parent's alias that got sub–usecases added, insert additional lines (once) right after the first occurrence:
-          For a "Browse" parent:
-              <parent> --> <parent>A
-              <parent> --> <parent>B
-          For a "Manage" parent:
-              <parent> --> <parent>A
-              <parent> --> <parent>B
-              <parent> --> <parent>C
-
-    If sub–usecases already exist for a usecase, no changes are made.
+    Optimizes a use case diagram in PlantUML by adding appropriate sub-usecases.
     """
     lines = diagram_text.splitlines()
 
@@ -126,71 +106,82 @@ def optimize_use_case_diagram(diagram_text):
     if block_end_idx is None:
         return diagram_text  # Block not closed properly.
 
-    # Process the block content (lines inside the rectangle block).
+    # Process the block content
     block_lines = lines[block_start_idx+1:block_end_idx]
     new_block_lines = []
-    # Dictionary to record which parent's alias gets added sub–usecases and of what type.
-    # key: parent's alias, value: "browse" or "manage"
-    sub_usecases_info = {}
+    sub_usecases_info = {}  # Track which usecases get sub-usecases
 
-    # First, scan for existing sub–usecase definitions in the block.
-    # We assume that any usecase whose alias ends with an extra uppercase letter is a sub–usecase.
+    # First, scan for existing sub-usecase definitions
     existing_subs = {}
+    usecase_aliases = {}  # Track all usecase aliases
+    
     for line in block_lines:
-        m = re.search(r'\s+as\s+(\w+)', line)
+        m = re.search(r'usecase\s+"([^"]+)"\s+as\s+(\w+)', line)
         if m:
-            alias = m.group(1)
-            # Check if alias ends with an extra uppercase letter.
-            if len(alias) > 1 and alias[-1].isalpha() and alias[-1].isupper() and not alias[-1].isdigit():
+            description, alias = m.groups()
+            usecase_aliases[alias] = description.lower()
+            # Check if this is a sub-usecase (based on naming convention or proximity)
+            if len(alias) > 1 and alias[-1].isalpha() and alias[-1].isupper():
                 parent_alias = alias[:-1]
                 existing_subs.setdefault(parent_alias, []).append(alias)
-    # Now process each line in the block.
+
+    # Now process each line in the block
     for line in block_lines:
         new_block_lines.append(line)
-        m = re.match(r'^(\s*)usecase\s+"([^"]+)"\s+as\s+(\w+)', line)
+        m = re.search(r'usecase\s+"([^"]+)"\s+as\s+(\w+)', line)
         if m:
-            indent, description, alias = m.groups()
+            description, alias = m.groups()
             desc_lower = description.lower()
-            # Skip if sub–usecases already exist for this alias.
+            # Skip if sub-usecases already exist for this alias
             if alias in existing_subs:
                 continue
-            # If description contains "browse", add two sub–usecases.
+                
+            # Add sub-usecases based on description
             if "browse" in desc_lower:
                 sub_usecases_info[alias] = "browse"
-                new_block_lines.append(f"{indent}usecase \"Browse by type\" as {alias}A")
-                new_block_lines.append(f"{indent}usecase \"Browse by <<add metric>>\" as {alias}B")
-            # Else if description contains "manage", add three sub–usecases.
+                new_block_lines.append(f"    usecase \"Browse by type\" as {alias}A")
+                new_block_lines.append(f"    usecase \"Browse by <<add metric>>\" as {alias}B")
             elif "manage" in desc_lower:
                 sub_usecases_info[alias] = "manage"
-                new_block_lines.append(f"{indent}usecase \"Add\" as {alias}A")
-                new_block_lines.append(f"{indent}usecase \"Update\" as {alias}B")
-                new_block_lines.append(f"{indent}usecase \"Delete\" as {alias}C")
+                new_block_lines.append(f"    usecase \"Add\" as {alias}A")
+                new_block_lines.append(f"    usecase \"Update\" as {alias}B")
+                new_block_lines.append(f"    usecase \"Delete\" as {alias}C")
 
-    # Reassemble the diagram with the new block.
+    # Reassemble the diagram with the new block
     new_lines = lines[:block_start_idx+1] + new_block_lines + lines[block_end_idx:]
 
     # --- 2. Process the relationship lines ---
-    # Relationship lines typically follow the rectangle block.
-    relationship_pattern = re.compile(r'^(\s*\S+)\s*--?>\s*(\w+)\s*$')
+    # Add relationships for all use cases that got sub-usecases, regardless of existing relationships
     final_lines = []
-    # Keep track of which parent's alias has already had sub–relationship lines inserted.
     inserted_for = set()
+    
+    # First, pass through all lines
     for line in new_lines:
         final_lines.append(line)
-        m = relationship_pattern.match(line)
-        if m:
-            source, target = m.groups()
-            # If the target is one of our modified parent's aliases and we haven't yet inserted sub–relationship lines:
-            if target in sub_usecases_info and target not in inserted_for:
-                indent = re.match(r'^(\s*)', line).group(1)
-                if sub_usecases_info[target] == "browse":
-                    final_lines.append(f"{indent}{target} --> {target}A:<<extend>>")
-                    final_lines.append(f"{indent}{target} --> {target}B:<<extend>>")
-                elif sub_usecases_info[target] == "manage":
-                    final_lines.append(f"{indent}{target} --> {target}A:<<include>>")
-                    final_lines.append(f"{indent}{target} --> {target}B:<<include>>")
-                    final_lines.append(f"{indent}{target} --> {target}C:<<include>>")
-                inserted_for.add(target)
+        
+    # Then append sub-usecase relationships at the end, before @enduml
+    enduml_index = -1
+    for i, line in enumerate(final_lines):
+        if line.strip() == "@enduml":
+            enduml_index = i
+            break
+    
+    # Insert relationship lines before @enduml
+    relationship_lines = []
+    for alias, type_of in sub_usecases_info.items():
+        if type_of == "browse":
+            relationship_lines.append(f"{alias} --> {alias}A: <<extend>>")
+            relationship_lines.append(f"{alias} --> {alias}B: <<extend>>")
+        elif type_of == "manage":
+            relationship_lines.append(f"{alias} --> {alias}A: <<include>>")
+            relationship_lines.append(f"{alias} --> {alias}B: <<include>>")
+            relationship_lines.append(f"{alias} --> {alias}C: <<include>>")
+    
+    if enduml_index >= 0:
+        final_lines = final_lines[:enduml_index] + relationship_lines + final_lines[enduml_index:]
+    else:
+        final_lines.extend(relationship_lines)
+        
     return "\n".join(final_lines)
 
 
