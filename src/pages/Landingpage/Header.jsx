@@ -1,10 +1,19 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import logo from '../../images/logo.png';
 import Illustration from '../../images/Illustration.png';
 import Switch from '../../components/DayNight';
 import logoDark from '../../images/logo_dark.png';
-const Header = ({ setIsDark }) => {
+const Header = ({ setIsDark, setIsGuest  }) => {
+
+  const navigate = useNavigate();
+
+  const handleGetStarted = () => {
+    console.log("Guest Mode Enabled");
+    setIsGuest(true); // ✅ Set guest mode
+    navigate('/EnhancedEditor'); // ✅ Redirect to editor
+  };
+
   return (
     <div className="bg-white dark:bg-gray-600 w-full text-black dark:text-white">
       {/* Navigation Header */}
@@ -60,13 +69,13 @@ const Header = ({ setIsDark }) => {
               automatically generates precise UML diagrams from textual requirements,
               enhancing accuracy and efficiency in system design.
             </p>
-            <Link
-              to="/EnhancedEditor"
+            <button
+              onClick={handleGetStarted} // ✅ Trigger guest mode
               className="inline-block bg-red-700 text-white px-6 sm:px-8 md:px-10 py-3 sm:py-4 rounded-full font-semibold hover:bg-gray-800 text-base sm:text-lg md:text-xl"
 
             >
               Get Started <span className="ml-2">✨</span>
-            </Link>
+            </button>
           </div>
 
           {/* Illustration */}

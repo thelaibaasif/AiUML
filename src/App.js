@@ -14,6 +14,8 @@ import BusinessPlanPage from "./components/BusinessPlanPage";
 
 function App() {
   const [isDark, setIsDark] = useState(false);
+  const [isGuest, setIsGuest] = useState(false);
+
   useEffect(() => {
     const html = document.documentElement;
     if (isDark) {
@@ -28,11 +30,14 @@ function App() {
         <Route path="/signup" element={<SignUp />} />
         <Route path="/login" element={<Login />} />
         <Route path="/features" element={<Features />} />
-        <Route path="/EnhancedEditor" element={<Editor />} />
+        <Route path="/EnhancedEditor" element={<Editor isGuest={isGuest} />} /> {/* ✅ Pass isGuest */}
         <Route path="/feedback" element={<Feedback />} />
         <Route path="/profile" element={<Profile />} />
         <Route path="/plans" element={<BusinessPlanPage />} />
-        <Route path="/" element={<LandingPage setIsDark={setIsDark} />} /> {/* ✅ Pass setter */}
+        <Route 
+          path="/" 
+          element={<LandingPage setIsDark={setIsDark} setIsGuest={setIsGuest} />} 
+        /> {/* ✅ Pass setIsGuest */} {/* ✅ Pass setter */}
         <Route path="/profile" element={<Profile />} />
       </Routes>
     </div>
