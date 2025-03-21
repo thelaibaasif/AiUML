@@ -8,10 +8,10 @@ import Clients from './Clients';
 import ConnectWithUs from './ConnectWithUs';
 import Footer from './Footer';
 
-const LandingPage = ({ setIsDark }) => {
+const LandingPage = ({ setIsDark, setIsGuest }) => {
   return (
     <div className="bg-white dark:bg-gray-700 transition duration-300 ease-in-out">
-        <Header setIsDark={setIsDark} />
+        <Header setIsDark={setIsDark} setIsGuest={setIsGuest} />
         {/* ... other sections */}
         <div>
         <div id="about">

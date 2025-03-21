@@ -78,7 +78,7 @@ def generate_plantuml_url(uml_text):
     return base_url + encoded_text
 
 
-
+# ----------------------------------- Use Case Optimization --------------------------- #
 
 def optimize_use_case_diagram(diagram_text):
     """
@@ -192,6 +192,8 @@ def optimize_use_case_diagram(diagram_text):
                 inserted_for.add(target)
     return "\n".join(final_lines)
 
+
+# ---------------------------------------------- ERD optimization ---------------------------------- #
 
 def optimize_ER_diagram(diagram_text):
     """
@@ -399,6 +401,120 @@ def optimize_ER_diagram(diagram_text):
 
     return diagram_text_optimized_entities
 
+# ------------------------------------ Class Diagram Optimization ---------------------------------- #
+
+def optimize_class_diagram(plantuml_code: str) -> str:
+    """
+    Optimize a PlantUML class diagram by applying the Facade pattern and flipping inheritance relationships.
+    
+    Steps:
+    1. Extract all class names from the diagram.
+    2. Remove any direct dependency lines from User (using '..>').
+    3. Flip any inheritance relationship (i.e., "Child --|> Parent" becomes "Parent <|-- Child").
+    4. Insert a Facade class with management methods for each class.
+    5. Add new relationships: 
+         - Link User to Facade (User --> Facade)
+         - Link Facade to all other classes (Facade ..> OtherClass)
+    """
+    lines = plantuml_code.splitlines()
+    class_names = []
+
+    # Identify class names (for both 'class' and 'abstract class' definitions)
+    class_pattern = re.compile(r"^\s*(abstract\s+class|class)\s+(\w+)")
+    for line in lines:
+        match = class_pattern.match(line)
+        if match:
+            class_name = match.group(2)
+            if class_name not in class_names:
+                class_names.append(class_name)
+
+    filtered_lines = []
+    inheritance_pattern = re.compile(r"^\s*(\w+)\s+--\|>\s+(\w+)")
+    dependency_pattern = re.compile(r"^\s*User\s+\.\.>\s+")
+    
+    # Process each line:
+    for line in lines:
+        # Skip dependency lines from User using '..>'
+        if dependency_pattern.search(line):
+            continue
+        
+        # If the line is an inheritance relationship, flip it.
+        m = inheritance_pattern.match(line)
+        if m:
+            child = m.group(1)
+            parent = m.group(2)
+            # Flip the arrow: Parent <|-- Child
+            new_line = f"{parent} <|-- {child}"
+            filtered_lines.append(new_line)
+            continue
+        
+        # Otherwise, keep the original line.
+        filtered_lines.append(line)
+
+    # Build the Facade class definition with manage methods for each class.
+    facade_lines = []
+    facade_lines.append("")
+    facade_lines.append("class Facade {")
+    for cname in class_names:
+        facade_lines.append(f"  + manage{cname}(): void")
+    facade_lines.append("}")
+
+    # Insert the Facade definition immediately after @startuml.
+    output_lines = []
+    inserted_facade = False
+    for line in filtered_lines:
+        output_lines.append(line)
+        if not inserted_facade and line.strip() == "@startuml":
+            output_lines.extend(facade_lines)
+            inserted_facade = True
+
+    # Create relationship lines to be added before @enduml.
+    relationship_lines = []
+    relationship_lines.append("")
+    relationship_lines.append("User --> Facade")
+    for cname in class_names:
+        if cname != "User":
+            relationship_lines.append(f"Facade ..> {cname}")
+
+    # Insert the new relationship lines before the closing @enduml.
+    final_lines = []
+    for line in output_lines:
+        if line.strip() == "@enduml":
+            final_lines.extend(relationship_lines)
+            final_lines.append(line)
+        else:
+            final_lines.append(line)
+
+    return "\n".join(final_lines)
+
+# ------------------------------------- Themes ----------------------------- #
+
+def apply_theme(diagram_text, theme_name):
+    # Define the regex patterns for the start markers and the theme line
+    start_pattern = r"(@start(?:uml|chen))"
+    theme_pattern = r"(!theme\s+\S+)"
+
+    # Check if the theme is already present after the start marker
+    match_start = re.search(start_pattern, diagram_text)
+    if match_start:
+        start_index = match_start.start()
+
+        # Look ahead after the start marker to find an existing theme and remove it
+        match_theme = re.search(theme_pattern, diagram_text[start_index:])
+        if match_theme:
+            # Remove the existing theme and add the new one
+            diagram_text = diagram_text[:start_index + match_theme.start()] + \
+                           f"!theme {theme_name}\n" + \
+                           diagram_text[start_index + match_theme.end():]
+        else:
+            # If no theme is found, just add the new theme
+            diagram_text = diagram_text[:start_index + len(match_start.group(0))] + \
+                           f"\n!theme {theme_name}\n" + \
+                           diagram_text[start_index + len(match_start.group(0)):]
+
+    return diagram_text
+
+# ------------------------------ Generate diagrams and handle edits ----------------------------- #
 
 @app.post("/process")
 async def process_text(request: Request):
@@ -438,6 +554,7 @@ async def process_text(request: Request):
     except Exception as e:
         return {"error": f"Failed to process the request: {str(e)}"}
     
+# ------------------------------------- Enhance diagrams ------------------------------- #
 
 @app.post("/enhance")
 async def enhance_diagram(request: Request):
@@ -455,6 +572,8 @@ async def enhance_diagram(request: Request):
             enhanced_code = optimize_use_case_diagram(code)
         elif diagram_type == "ERD":
             enhanced_code = optimize_ER_diagram(code)
+        elif diagram_type == "Class Diagram":
+            enhanced_code = optimize_class_diagram(code)
         else:
             enhanced_code = code
 
@@ -466,3 +585,28 @@ async def enhance_diagram(request: Request):
         }
     except Exception as e:
         return {"error": f"Failed to enhance diagram: {str(e)}"}
+    
+# ------------------------------------ Apply the selected themes ---------------------------- #
+
+@app.post("/apply-theme")
+async def apply_theme_endpoint(request: Request):
+    try:
+        data = await request.json()
+        diagram_code = data.get("text", "")
+        theme = data.get("theme", "")
+
+        if not diagram_code:
+            return {"error": "No diagram code provided"}
+
+        if not theme:
+            return {"error": "No theme specified"}
+
+        # Apply the theme
+        updated_code = apply_theme(diagram_code, theme)
+
+        # Generate the updated diagram URL
+        diagram_url = generate_plantuml_url(updated_code)
+
+        return {"updated_code": updated_code, "diagram_url": diagram_url}
+    except Exception as e:
+        return {"error": f"Failed to apply theme: {str(e)}"}

@@ -25,7 +25,7 @@ import "ace-builds/src-noconflict/theme-github";
 //import TokenLimitedInput from "../../components/TokenLimitedInput";
 
 
-const EditorPage = () => {
+const EditorPage = ({isGuest}) => {
   const [showSaveModal, setShowSaveModal] = useState(false);
   const [showDiagramDropdown, setShowDiagramDropdown] = useState(false);
   const [showCustomizeDropdown, setShowCustomizeDropdown] = useState(false);
@@ -63,8 +63,53 @@ const EditorPage = () => {
   const chatId = sessionStorage.getItem("chatId");
   const [message, setMessage] = useState("");
   const [profileData, setProfileData] = useState(null);
+  const [, setSessionId] = useState(null); //  Just defining setter
+  const [, setChatId] = useState(null); //  Same for chat ID
   
 
+
+  useEffect(() => {
+    const createGuestSession = async () => {
+      if (isGuest) {
+        console.log("Guest session starting...");
+  
+        // Create session for guest (without user ID)
+        const sessionRef = push(ref(realTimeDb, `guest_sessions/`));
+        console.log("Guest Session Ref:", sessionRef);
+  
+        await set(sessionRef, { createdAt: Date.now() })
+          .then(async () => {
+            console.log("Guest Session Created:", sessionRef.key);
+            sessionStorage.setItem("sessionId", sessionRef.key);
+  
+            // Create chat for guest session
+            const chatRef = push(ref(realTimeDb, `guest_sessions/${sessionRef.key}`));
+            await set(chatRef, { createdAt: Date.now() })
+              .then(() => {
+                console.log("Guest Chat Created:", chatRef.key);
+                sessionStorage.setItem("chatId", chatRef.key);
+              })
+              .catch((error) => console.error("Error creating guest chat:", error));
+          })
+          .catch((error) => console.error("Error creating guest session:", error));
+      }
+    };
+  
+    createGuestSession();
+  }, [isGuest]);
+
+  // useEffect(() => {
+  //   const user = auth.currentUser;
+  //   const userId = user ? user.uid : "guest"; // Use "guest" for guest users
+  //   const existingSessionId = sessionStorage.getItem("sessionId");
+  //   const existingChatId = sessionStorage.getItem("chatId");
+  
+  //   // Only create session and chat if none exists for guests
+  //   if (userId === "guest" && (!existingSessionId || !existingChatId)) {
+  //     console.log("No existing session/chat for guest — creating new session and chat...");
+  //     createSession(); //Create session for guest
+  //   }
+  // }, []);
 
   
    useEffect(() => {
@@ -105,6 +150,45 @@ const EditorPage = () => {
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
+
+  // const createSession = async () => {
+  //   const user = auth.currentUser;
+  //   const userId = user ? user.uid : "guest"; //  Use "guest" for guest mode
+  
+  //   try {
+  //     const sessionRef = push(ref(realTimeDb, `chats/${userId}`));
+  //     await set(sessionRef, { createdAt: Date.now() });
+  
+  //     const sessionId = sessionRef.key;
+  //     setSessionId(sessionId);
+  //     sessionStorage.setItem("sessionId", sessionId);
+  
+  //     console.log(`Session created for user: ${userId} → Session ID: ${sessionId}`);
+  
+  //     //  Automatically create chat after session
+  //     await createChat(sessionId);
+  //   } catch (error) {
+  //     console.error("Error creating session:", error);
+  //   }
+  // };
+
+  // const createChat = async (sessionId) => {
+  //   const user = auth.currentUser;
+  //   const userId = user ? user.uid : "guest"; //  Use "guest" for guest mode
+  
+  //   try {
+  //     const chatRef = push(ref(realTimeDb, `chats/${userId}/${sessionId}`));
+  //     await set(chatRef, { createdAt: Date.now() });
+  
+  //     const chatId = chatRef.key;
+  //     setChatId(chatId);
+  //     sessionStorage.setItem("chatId", chatId);
+  
+  //     console.log(`Chat created for user: ${userId} → Chat ID: ${chatId}`);
+  //   } catch (error) {
+  //     console.error("Error creating chat:", error);
+  //   }
+  // };
   
   const handleSaveProject = async () => {
     const diagramState = {
@@ -411,6 +495,36 @@ const handleExport = async (format) => {
       console.error("Error enhancing diagram:", error);
     }
   };
+
+  const handleThemeSelect = async (theme) => {
+    console.log("Applying theme:", theme);
+  
+    try {
+      console.log("Applying theme:", theme);
+      const response = await fetch("http://localhost:8000/apply-theme", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          text: output, // Existing diagram code
+          theme: theme, //  Send theme to backend
+        }),
+      });
+  
+      const data = await response.json();
+  
+      if (data.updated_code) {
+        setOutput(data.updated_code);
+        setActiveDiagram((prev) => ({
+          ...prev,
+          image: data.diagram_url,
+        }));
+      }
+    } catch (error) {
+      console.error("Error applying theme:", error);
+    }  
+  };
+  
+
 
   // Fuction to handle signout
   const handleSignOut = async () => {
@@ -812,12 +926,13 @@ const handleExport = async (format) => {
 {label === "Customize" && state && (
   <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 backdrop-blur-sm">
   <div ref={customizeRef}>
-    <ThemeSelector
-      onSelectTheme={(theme) => {
-        console.log("Selected theme:", theme);
-        setShowCustomizeDropdown(false);
-      }}
-    />
+  <ThemeSelector
+  onSelectTheme={(theme) => {
+    console.log("Selected theme:", theme);
+    handleThemeSelect(theme); //  Apply theme
+    setShowCustomizeDropdown(false); //  Close dropdown after selection
+  }}
+/>
   </div>
   </div>
 )}
