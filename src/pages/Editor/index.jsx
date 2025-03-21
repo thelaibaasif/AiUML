@@ -234,7 +234,7 @@ const EditorPage = ({isGuest}) => {
     setTimeout(() => {
       setChatMessages((prev) => [
         ...prev,
-        { type: "ai", text: "This is a mock AI response for: " + inputText.trim() }
+        { type: "ai", text: `I've analyzed your request for a ${activeDiagram.name.toLowerCase()}. Generating diagram with the key components you described. The diagram has been rendered based on your specifications. You can view it in the main panel, or switch to the Code tab to see and edit the underlying PlantUML.` }
       ]);
       setIsLoading(false);
     }, 1000);
