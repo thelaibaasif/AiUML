@@ -911,12 +911,33 @@ const handleExport = async (format) => {
     <div className="flex justify-center">
       <input
         type="color"
-        onChange={(e) => {
+        onChange={async (e) => {
           const pickedColor = e.target.value;
-          document.documentElement.style.setProperty('--tw-bg-opacity', '1');
-          document.documentElement.style.setProperty('--tw-text-opacity', '1');
-          document.documentElement.style.setProperty('--tw-bg-color', pickedColor);
+          console.log("Picked color:", pickedColor);
+        
+          try {
+            const response = await fetch("http://localhost:8000/set-color", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({ text: output, color: pickedColor }),
+            });
+        
+            const data = await response.json();
+        
+            if (data.generated_code) {
+              setOutput(data.generated_code); //  Update code state
+              setActiveDiagram((prev) => ({
+                ...prev,
+                image: data.diagram_url, //  Update diagram preview
+              }));
+            }
+          } catch (error) {
+            console.error("Failed to apply color:", error);
+          }
         }}
+        
         className="w-20 h-20 border-2 border-gray-300 rounded-full shadow-md cursor-pointer"
       />
     </div>

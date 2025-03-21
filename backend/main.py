@@ -2,6 +2,7 @@ import zlib
 import base64
 import requests
 import re
+from typing import Optional
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 #from transformers import pipeline
@@ -514,6 +515,79 @@ def apply_theme(diagram_text, theme_name):
 
     return diagram_text
 
+# -------------------------------------------- Colors -------------------------------------------#
+
+def process_element_line(line: str, color: Optional[str]) -> str:
+    """
+    Processes an element definition line (for actors, classes, entities, etc.).
+    It looks for an existing hex color (format "#xxxxxx") before a code block (i.e. before '{')
+    and either replaces it with the new color or removes it.
+    If no color is found and a new color is provided, it is appended.
+    """
+    # Check if there's a code block (indicated by '{')
+    brace_index = line.find("{")
+    if brace_index != -1:
+        pre = line[:brace_index]
+        post = line[brace_index:]
+    else:
+        pre = line
+        post = ""
+    # Remove any existing hex color from the "pre" part.
+    pre = re.sub(r'\s*#[0-9a-fA-F]{6}', '', pre)
+    pre = pre.rstrip()
+    # If a new color is provided, append it (with a preceding space)
+    if color:
+        pre += " " + color
+    return pre + post
+
+def apply_color_to_plantuml(plantuml_code: str, color: Optional[str]) -> str:
+    """
+    Given a PlantUML diagram and a hex color string (e.g. "#32a852"),
+    this function applies the color only to element definitions (like actors, classes,
+    entities, rectangles, participants, and relationship blocks that use a code block).
+    
+    If an element already has a hex color, it is replaced with the new color.
+    If color is None (or empty), any such color is removed.
+    
+    Lines that don't start with one of the target keywords (or lines such as relationship arrow lines)
+    are left unchanged.
+    """
+    # Keywords to detect element definitions where color should be applied.
+    keywords = [
+        "abstract class",
+        "class",
+        "actor",
+        "entity",
+        "rectangle",
+        "participant",
+        "relationship"
+    ]
+    
+    # Process the diagram line by line.
+    lines = plantuml_code.splitlines()
+    new_lines = []
+    
+    for line in lines:
+        stripped = line.lstrip()
+        # Do not modify lines starting with '@' (e.g., @startuml, @enduml, etc.)
+        if stripped.startswith("@"):
+            new_lines.append(line)
+            continue
+        
+        lower_line = stripped.lower()
+        processed = False
+        for kw in keywords:
+            if lower_line.startswith(kw):
+                new_lines.append(process_element_line(line, color))
+                processed = True
+                break
+        if not processed:
+            # Leave any line that is not an element definition untouched.
+            new_lines.append(line)
+    
+    return "\n".join(new_lines)
+
+
 # ------------------------------ Generate diagrams and handle edits ----------------------------- #
 
 @app.post("/process")
@@ -610,3 +684,26 @@ async def apply_theme_endpoint(request: Request):
         return {"updated_code": updated_code, "diagram_url": diagram_url}
     except Exception as e:
         return {"error": f"Failed to apply theme: {str(e)}"}
+
+# --------------------------------- Applying Colors ------------------------------ #
+
+@app.post("/set-color")
+async def set_color(request: Request):
+    try:
+        data = await request.json()
+        code = data.get("text", "")
+        color = data.get("color", "")
+
+        if not code:
+            return {"error": "No diagram code provided"}
+
+        # Apply color using the function
+        updated_code = apply_color_to_plantuml(code, color)
+
+        diagram_url = generate_plantuml_url(updated_code)
+
+        return {"generated_code": updated_code, "diagram_url": diagram_url}
+
+    except Exception as e:
+        print(f"Failed to apply color: {e}")
+        return {"error": f"Failed to apply colors: {str(e)}"}
