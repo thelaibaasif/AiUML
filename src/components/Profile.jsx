@@ -44,7 +44,7 @@ const Profile = () => {
             <label className="block text-gray-700 font-semibold mb-1">Full Name</label>
             <input
               type="text"
-              value={profileData?.name || ""}
+              value={profileData?.name || "Guest"}
               readOnly
               className="w-full px-4 py-2 border rounded-md border-gray-300 focus:outline-none focus:ring-2 focus:ring-red-700 bg-gray-100"
             />
@@ -54,7 +54,7 @@ const Profile = () => {
             <label className="block text-gray-700 font-semibold mb-1">Email</label>
             <input
               type="email"
-              value={profileData?.email || ""}
+              value={profileData?.email || "No email associated with guest user"}
               readOnly
               className="w-full px-4 py-2 border rounded-md border-gray-300 focus:outline-none focus:ring-2 focus:ring-red-700 bg-gray-100"
             />

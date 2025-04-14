@@ -65,12 +65,18 @@ const EditorPage = ({isGuest}) => {
   const [profileData, setProfileData] = useState(null);
   const [, setSessionId] = useState(null); //  Just defining setter
   const [, setChatId] = useState(null); //  Same for chat ID
+  const hasCreatedGuestSession = useRef(false);
   
-
+// -------------------------- Checking if the user is guest or not ---------------------------------------------- //
 
   useEffect(() => {
+    const sessionAlreadyExists = sessionStorage.getItem("sessionId");
+    const chatAlreadyExists = sessionStorage.getItem("chatId");
+
     const createGuestSession = async () => {
+      if (hasCreatedGuestSession.current || sessionAlreadyExists || !isGuest) return;
       if (isGuest) {
+        hasCreatedGuestSession.current = true;
         console.log("Guest session starting...");
   
         // Create session for guest (without user ID)
@@ -111,7 +117,8 @@ const EditorPage = ({isGuest}) => {
   //   }
   // }, []);
 
-  
+// ------------------------------------ Getting user data from db -------------------------------------------- //
+
    useEffect(() => {
       const fetchUserData = async () => {
         const user = auth.currentUser;
@@ -151,45 +158,7 @@ const EditorPage = ({isGuest}) => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  // const createSession = async () => {
-  //   const user = auth.currentUser;
-  //   const userId = user ? user.uid : "guest"; //  Use "guest" for guest mode
-  
-  //   try {
-  //     const sessionRef = push(ref(realTimeDb, `chats/${userId}`));
-  //     await set(sessionRef, { createdAt: Date.now() });
-  
-  //     const sessionId = sessionRef.key;
-  //     setSessionId(sessionId);
-  //     sessionStorage.setItem("sessionId", sessionId);
-  
-  //     console.log(`Session created for user: ${userId} → Session ID: ${sessionId}`);
-  
-  //     //  Automatically create chat after session
-  //     await createChat(sessionId);
-  //   } catch (error) {
-  //     console.error("Error creating session:", error);
-  //   }
-  // };
 
-  // const createChat = async (sessionId) => {
-  //   const user = auth.currentUser;
-  //   const userId = user ? user.uid : "guest"; //  Use "guest" for guest mode
-  
-  //   try {
-  //     const chatRef = push(ref(realTimeDb, `chats/${userId}/${sessionId}`));
-  //     await set(chatRef, { createdAt: Date.now() });
-  
-  //     const chatId = chatRef.key;
-  //     setChatId(chatId);
-  //     sessionStorage.setItem("chatId", chatId);
-  
-  //     console.log(`Chat created for user: ${userId} → Chat ID: ${chatId}`);
-  //   } catch (error) {
-  //     console.error("Error creating chat:", error);
-  //   }
-  // };
-  
   const handleSaveProject = async () => {
     const diagramState = {
       diagram: activeDiagram,
@@ -245,7 +214,7 @@ const EditorPage = ({isGuest}) => {
     }, 1000);
   
   };  
-
+// ----------------------------------- Submit Button(Input the prompt) ----------------------------------- //
    // Function to handle submission
    const handleSubmit = async () => {
     if (!inputText.trim()) return; // Avoid empty submissions
@@ -290,12 +259,34 @@ const EditorPage = ({isGuest}) => {
     }
   };
 
+// --------------------------------------- Saving Prompt to DB ---------------------------------------- //
+
   const sendMessage = async () => {
     console.log("Send Message Triggered");
     const user = auth.currentUser;
     console.log("User:", user);
   
-    if (user && sessionId && chatId && message.trim()) {
+    if (isGuest){
+      console.log("Session ID:", sessionId);
+      console.log("Chat ID:", chatId);
+      console.log("Message:", message);
+
+      // Reference for storing messages
+      const messageRef = push(ref(realTimeDb, `guest_sessions/${sessionId}/${chatId}`))
+
+      // Store message
+      await set(messageRef, {
+        text: message,
+        sender: "Guest",
+        timestamp: Date.now(),
+      })
+        .then(() => {
+          console.log("Message sent successfully!");
+          setMessage(""); // Clear input field
+        })
+        .catch((error) => console.error("Error sending message:", error));
+    }
+    else if (user && sessionId && chatId && message.trim()) {
       console.log("Session ID:", sessionId);
       console.log("Chat ID:", chatId);
       console.log("Message:", message);
@@ -319,6 +310,8 @@ const EditorPage = ({isGuest}) => {
     }
   };
 
+// ------------------------------------------ Saving Edited Code (Edit) --------------------------------------- //
+
   const saveEditedCode = async() => {
     try {
       if (!output.trim()) return;
@@ -338,30 +331,58 @@ const EditorPage = ({isGuest}) => {
       if (data.generated_code) {
         console.log("Edited Code Saved:", data.generated_code);
 
-        //  Update chat in Realtime Database
-        const user = auth.currentUser;
-        const sessionId = sessionStorage.getItem("sessionId");
-        const chatId = sessionStorage.getItem("chatId");
-        const messageId = sessionStorage.getItem("messageId");
-        if (user && sessionId && chatId && messageId) {
-          const existingMessageRef = ref(realTimeDb, `chats/${user.uid}/${sessionId}/${chatId}/${messageId}`);
-          await set(existingMessageRef, {
-            text: data.generated_code,
-            sender: "AiUML",
-            timestamp: Date.now(),
-          });
+        if (isGuest) {
 
-          console.log("Updated code saved to DB");
+          const sessionId = sessionStorage.getItem("sessionId");
+          const chatId = sessionStorage.getItem("chatId");
+          const messageId = sessionStorage.getItem("messageId");
+          if (sessionId && chatId && messageId) {
+            const existingMessageRef = ref(realTimeDb, `guest_sessions/${sessionId}/${chatId}/${messageId}`);
+            await set(existingMessageRef, {
+              text: data.generated_code,
+              sender: "AiUML",
+              timestamp: Date.now(),
+            });
 
-          //  Update frontend state
-          setOutput(data.generated_code);
-          setActiveDiagram((prev) => ({
-            ...prev,
-            image: data.diagram_url,
-            name: activeDiagram.name,
-          }));
+            console.log("Updated code saved to DB");
+
+            //  Update frontend state
+            setOutput(data.generated_code);
+            setActiveDiagram((prev) => ({
+              ...prev,
+              image: data.diagram_url,
+              name: activeDiagram.name,
+            }));
+          } else {
+            console.error("Missing user, session, or chat ID");
+          }
         } else {
-          console.error("Missing user, session, or chat ID");
+
+          //  Update chat in Realtime Database
+          const user = auth.currentUser;
+          const sessionId = sessionStorage.getItem("sessionId");
+          const chatId = sessionStorage.getItem("chatId");
+          const messageId = sessionStorage.getItem("messageId");
+          if (user && sessionId && chatId && messageId) {
+            const existingMessageRef = ref(realTimeDb, `chats/${user.uid}/${sessionId}/${chatId}/${messageId}`);
+            await set(existingMessageRef, {
+              text: data.generated_code,
+              sender: "AiUML",
+              timestamp: Date.now(),
+            });
+
+            console.log("Updated code saved to DB");
+
+            //  Update frontend state
+            setOutput(data.generated_code);
+            setActiveDiagram((prev) => ({
+              ...prev,
+              image: data.diagram_url,
+              name: activeDiagram.name,
+            }));
+          } else {
+            console.error("Missing user, session, or chat ID");
+          }
         }
       }
     } catch (error) {
@@ -380,19 +401,41 @@ const EditorPage = ({isGuest}) => {
     }
   };
 
+// --------------------------------------------- Saving Code to DB -------------------------------------------- //
+
   const saveCode = async () => {
-    const user = auth.currentUser;
-    if (user && sessionId && chatId && output) {
-      const messageRef = ref(realTimeDb, `chats/${user.uid}/${sessionId}/${chatId}`);
-      const newMessageRef = push(messageRef);
-      const messageId = newMessageRef.key;
-      await set(newMessageRef, {
-        text: output, // Saving the code here
-        sender: "AiUML",
-        timestamp: Date.now(),
-      });
-      sessionStorage.setItem("messageId", messageId);
-      console.log("Generated code saved:", output);
+
+    if (isGuest)
+    { 
+      const sessionId = sessionStorage.getItem("sessionId");
+      const chatId = sessionStorage.getItem("chatId");
+      if (sessionId && chatId && output) {
+        const messageRef = ref(realTimeDb, `guest_sessions/${sessionId}/${chatId}`);
+        const newMessageRef = push(messageRef);
+        const messageId = newMessageRef.key;
+        await set(newMessageRef, {
+          text: output, // Saving the code here
+          sender: "AiUML",
+          timestamp: Date.now(),
+        });
+        sessionStorage.setItem("messageId", messageId);
+        console.log("Generated code saved:", output);
+      }
+    } 
+    else {
+      const user = auth.currentUser;
+      if (user && sessionId && chatId && output) {
+        const messageRef = ref(realTimeDb, `chats/${user.uid}/${sessionId}/${chatId}`);
+        const newMessageRef = push(messageRef);
+        const messageId = newMessageRef.key;
+        await set(newMessageRef, {
+          text: output, // Saving the code here
+          sender: "AiUML",
+          timestamp: Date.now(),
+        });
+        sessionStorage.setItem("messageId", messageId);
+        console.log("Generated code saved:", output);
+      }
     }
   };
   
@@ -465,36 +508,73 @@ const handleExport = async (format) => {
   
       const data = await response.json();
 
-      //  Update chat in Realtime Database
-      const user = auth.currentUser;
-      const sessionId = sessionStorage.getItem("sessionId");
-      const chatId = sessionStorage.getItem("chatId");
-      const messageId = sessionStorage.getItem("messageId");
-      if (user && sessionId && chatId && messageId) {
-        const existingMessageRef = ref(realTimeDb, `chats/${user.uid}/${sessionId}/${chatId}/${messageId}`);
-        await set(existingMessageRef, {
-          text: data.enhanced_code,
-          sender: "AiUML",
-          timestamp: Date.now(),
-        });
+      console.log("Generated code:", data.enhanced_code);
 
-        console.log("Updated code saved to DB");
-  
-      if (data.enhanced_code) {
-        setOutput(data.enhanced_code);
-        const newUrl = data.diagram_url;
-        setActiveDiagram((prev) => ({
-          ...prev,
-          image: newUrl,
-          name: activeDiagram.name,
-        }));
+      if (isGuest) {
+
+        const sessionId = sessionStorage.getItem("sessionId");
+        const chatId = sessionStorage.getItem("chatId");
+        const messageId = sessionStorage.getItem("messageId");
+        if (sessionId && chatId && messageId) {
+          const existingMessageRef = ref(realTimeDb, `guest_sessions/${sessionId}/${chatId}/${messageId}`);
+          await set(existingMessageRef, {
+            text: data.enhanced_code,
+            sender: "AiUML",
+            timestamp: Date.now(),
+          });
+
+          console.log("Updated code saved to DB");
+
+          if (data.enhanced_code) {
+            setOutput(data.enhanced_code);
+            const newUrl = data.diagram_url;
+            setActiveDiagram((prev) => ({
+              ...prev,
+              image: newUrl,
+              name: activeDiagram.name,
+            }));
+          } else {
+            console.error("Error enhancing diagram:", data.error);
+          }
+      
+            console.log("Enhanced code saved:", data.enhanced_code);
+          } else {
+            console.error("Missing user, session, or chat ID");
+          }
       } else {
-        console.error("Missing user, session, or chat ID");
-      }
-  
-        console.log("Enhanced code saved:", data.enhanced_code);
-      } else {
-        console.error("Error enhancing diagram:", data.error);
+
+        //  Update chat in Realtime Database
+        const user = auth.currentUser;
+        const sessionId = sessionStorage.getItem("sessionId");
+        const chatId = sessionStorage.getItem("chatId");
+        const messageId = sessionStorage.getItem("messageId");
+        if (user && sessionId && chatId && messageId) {
+          const existingMessageRef = ref(realTimeDb, `chats/${user.uid}/${sessionId}/${chatId}/${messageId}`);
+          await set(existingMessageRef, {
+            text: data.enhanced_code,
+            sender: "AiUML",
+            timestamp: Date.now(),
+          });
+
+          console.log("Updated code saved to DB");
+    
+          if (data.enhanced_code) {
+            setOutput(data.enhanced_code);
+            const newUrl = data.diagram_url;
+            setActiveDiagram((prev) => ({
+              ...prev,
+              image: newUrl,
+              name: activeDiagram.name,
+            }));
+          } else {
+            console.error("Error enhancing diagram:", data.error);
+            
+          }
+    
+          console.log("Enhanced code saved:", data.enhanced_code);
+        } else {
+          console.error("Missing user, session, or chat ID");
+        }
       }
     } catch (error) {
       console.error("Error enhancing diagram:", error);
