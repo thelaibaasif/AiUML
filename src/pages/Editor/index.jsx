@@ -66,6 +66,7 @@ const EditorPage = ({isGuest}) => {
   const [, setSessionId] = useState(null); //  Just defining setter
   const [, setChatId] = useState(null); //  Same for chat ID
   const hasCreatedGuestSession = useRef(false);
+  const textRef = useRef(null); // For input Field
   
 // -------------------------- Checking if the user is guest or not ---------------------------------------------- //
 
@@ -185,6 +186,15 @@ const EditorPage = ({isGuest}) => {
     } text-white px-4 py-2 rounded-full transition`;
   };
   
+// ---------------------------------------- Text input field -----------------------------------------------------//
+const handleInputResize = () => {
+  const el = textRef.current;
+  if (el) {
+    el.style.height = "auto";
+    el.style.height = Math.min(el.scrollHeight, 150) + "px";
+  }
+};
+
   //handle chat submit and loading
   const handleChatSubmit = async () => {
     if (!inputText.trim()) return; // Prevent empty submissions
@@ -899,13 +909,15 @@ const handleExport = async (format) => {
 {activeTab !== "Recent" && (
   <div>
     <div className="flex items-center space-x-2 mb-4">
-      <input
+      <textarea
+        ref={textRef}
         type="text"
         placeholder="Type here..."
         value={inputText}
         onChange={(e) => {
           setInputText(e.target.value);
           setMessage(e.target.value);
+          handleInputResize();
           }
         }
         className="flex-grow px-4 py-2 rounded-md border border-gray-300"
