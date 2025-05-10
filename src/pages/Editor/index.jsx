@@ -196,34 +196,39 @@ const handleInputResize = () => {
 };
 
   //handle chat submit and loading
-  const handleChatSubmit = async () => {
-    if (!inputText.trim()) return; // Prevent empty submissions
-    setIsLoading(true);
-    try {
-      await handleSubmit();
-    } catch (error) {
-      console.error("Submission error:", error);
-    } finally {
-      setIsLoading(false);
-    }
-
+const handleChatSubmit = async () => {
+  if (!inputText.trim()) return; // Prevent empty submissions
+  
+  // First add the user message to chat immediately
+  setChatMessages((prev) => [
+    ...prev,
+    { type: "user", text: inputText.trim() }
+  ]);
+  
+  // Store current input before clearing
+  const currentInput = inputText.trim();
+  
+  // Clear input field right away
+  setInputText("");
+  
+  // Then set loading state and process the submission
+  setIsLoading(true);
+  try {
+    await handleSubmit();
+  } catch (error) {
+    console.error("Submission error:", error);
+  } finally {
+    setIsLoading(false);
+  }
+  
+  // Fake response from AI (optional)
+  setTimeout(() => {
     setChatMessages((prev) => [
       ...prev,
-      { type: "user", text: inputText.trim() }
+      { type: "ai", text: `I've analyzed your request for a ${activeDiagram.name.toLowerCase()}. Generating diagram with the key components you described. The diagram has been rendered based on your specifications. You can view it in the main panel, or switch to the Code tab to see and edit the underlying PlantUML.` }
     ]);
-    setInputText("");
-    setIsLoading(true);
-  
-    // Fake response from AI (optional)
-    setTimeout(() => {
-      setChatMessages((prev) => [
-        ...prev,
-        { type: "ai", text: `I've analyzed your request for a ${activeDiagram.name.toLowerCase()}. Generating diagram with the key components you described. The diagram has been rendered based on your specifications. You can view it in the main panel, or switch to the Code tab to see and edit the underlying PlantUML.` }
-      ]);
-      setIsLoading(false);
-    }, 1000);
-  
-  };  
+  }, 1000);
+};  
 // ----------------------------------- Submit Button(Input the prompt) ----------------------------------- //
    // Function to handle submission
    const handleSubmit = async () => {
@@ -781,13 +786,15 @@ const handleExport = async (format) => {
   {activeTab === "Chat" ? (
     <>
 {/* CHAT MESSAGES AREA */}
-<div className="bg-white border border-gray-300 rounded-md mb-4 w-full h-80 overflow-y-auto p-4 shadow-inner">
+<div className="bg-white border border-gray-300 rounded-md mb-4 w-full h-80 overflow-y-auto p-4 shadow-inner"
+style={{ height: "500px" }}
+>
   {chatMessages.map((msg, index) => (
     <div
       key={index}
       className={`mb-2 p-2 rounded-md ${
         msg.type === "user"
-          ? "bg-red-100 text-gray-800 text-right"
+          ? "bg-red-100 text-gray-800 text-left"
           : "bg-gray-100 text-gray-800 text-left"
       }`}
     >
@@ -807,7 +814,7 @@ const handleExport = async (format) => {
     value={output}
     onChange={newValue => setOutput(newValue)}
     width="100%"
-    height="400px"
+    height="500px"
     fontSize={14}
     setOptions={{
       enableBasicAutocompletion: true,
