@@ -25,9 +25,9 @@ import "ace-builds/src-noconflict/theme-github";
 //import TokenLimitedInput from "../../components/TokenLimitedInput";
 
 //deployment urls
-const LOCAL_URL = "http://localhost:8000";
-const DEPLOYED_URL = "https://aiuml-backend.onrender.com";
-const BASE_URL = window.location.hostname === "localhost" ? LOCAL_URL : DEPLOYED_URL;
+//const LOCAL_URL = "http://localhost:8000";
+//const DEPLOYED_URL = "https://aiuml-backend.onrender.com";
+const BASE_URL = "https://aiuml-backend.onrender.com";
 
 const EditorPage = ({isGuest}) => {
   const [showSaveModal, setShowSaveModal] = useState(false);
@@ -470,7 +470,7 @@ const handleExport = async (format) => {
   const exportUrl = activeDiagram.image.replace("/svg/", `/${format}/`);
 
   try {
-    const response = await fetch(`${BASE_URL}${exportUrl}`);
+    const response = await fetch(exportUrl);
     if (!response.ok) throw new Error(`Failed to fetch image: ${response.statusText}`);
 
     const blob = await response.blob(); 
