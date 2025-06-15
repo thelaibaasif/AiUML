@@ -30,6 +30,7 @@ const SignUp = () => {
   const [chatId, setChatId] = useState(null);
   const newSessionId = useRef(null);
   const newChatId = useRef(null);
+  const [isGuest, setIsGuest] = useState(false);
 
   const validateName = (name) => name.trim().length > 2;
   const validateEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
@@ -103,6 +104,11 @@ const SignUp = () => {
 
   // Function for session creation in rrealtime db
     const createSession = async () => {
+      console.log("Removing guest session if exists...");
+      setIsGuest(false);
+      sessionStorage.removeItem("isGuest");
+      sessionStorage.removeItem("sessionId");
+      sessionStorage.removeItem("chatId");
       console.log("Creating Session...");
       const user = auth.currentUser;
       if (user) {
