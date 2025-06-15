@@ -24,6 +24,9 @@ import "ace-builds/src-noconflict/mode-text";
 import "ace-builds/src-noconflict/theme-github";
 //import TokenLimitedInput from "../../components/TokenLimitedInput";
 
+const LOCAL_URL = "http://localhost:8000";
+const DEPLOYED_URL = "https://aiuml-backend.onrender.com";
+const BASE_URL = window.location.hostname === "localhost" ? LOCAL_URL : DEPLOYED_URL;
 
 const EditorPage = ({isGuest}) => {
   const [showSaveModal, setShowSaveModal] = useState(false);
@@ -234,7 +237,7 @@ const handleChatSubmit = async () => {
    const handleSubmit = async () => {
     if (!inputText.trim()) return; // Avoid empty submissions
    try {
-     const response = await fetch("http://localhost:8000/process", {
+     const response = await fetch(`${BASE_URL}/process`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -333,7 +336,7 @@ const handleChatSubmit = async () => {
 
       console.log("Sending edited code...");
 
-      const response = await fetch("http://localhost:8000/process", {
+      const response = await fetch(`${BASE_URL}/process`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -466,7 +469,7 @@ const handleExport = async (format) => {
   const exportUrl = activeDiagram.image.replace("/svg/", `/${format}/`);
 
   try {
-    const response = await fetch(exportUrl);
+    const response = await fetch(`${BASE_URL}${exportUrl}`);
     if (!response.ok) throw new Error(`Failed to fetch image: ${response.statusText}`);
 
     const blob = await response.blob(); 
@@ -513,7 +516,7 @@ const handleExport = async (format) => {
     console.log("Enhancing diagram...");
   
     try {
-      const response = await fetch("http://localhost:8000/enhance", {
+      const response = await fetch(`${BASE_URL}/enhance`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -601,7 +604,7 @@ const handleExport = async (format) => {
   
     try {
       console.log("Applying theme:", theme);
-      const response = await fetch("http://localhost:8000/apply-theme", {
+      const response = await fetch(`${BASE_URL}/apply-theme`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -1020,7 +1023,7 @@ style={{ height: "500px" }}
           console.log("Picked color:", pickedColor);
         
           try {
-            const response = await fetch("http://localhost:8000/set-color", {
+            const response = await fetch(`${BASE_URL}/set-color`, {
               method: "POST",
               headers: {
                 "Content-Type": "application/json",
