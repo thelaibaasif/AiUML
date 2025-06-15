@@ -22,6 +22,8 @@ import ProfileIcon from "../../components/ProfileIcon"; // Adjust path if needed
 import AceEditor from "react-ace";
 import "ace-builds/src-noconflict/mode-text";
 import "ace-builds/src-noconflict/theme-github";
+import "ace-builds/src-noconflict/mode-java";
+import "ace-builds/src-noconflict/theme-chrome";
 //import TokenLimitedInput from "../../components/TokenLimitedInput";
 
 //deployment urls
@@ -45,7 +47,8 @@ const EditorPage = ({isGuest}) => {
   const [zoomLevel, setZoomLevel] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
   const [inputText, setInputText] = useState("");
-  const [output, setOutput] = useState("");
+  const [output, setOutput] = useState(""); //for plantuml code
+  const [javaCode, setJavaCode] = useState(""); // For Java code
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
   const [historyData, setHistoryData] = useState([
@@ -309,6 +312,7 @@ const handleChatSubmit = async () => {
       console.log("Session ID:", sessionId);
       console.log("Chat ID:", chatId);
       console.log("Message:", message);
+      console.log("Profile Data", profileData)
   
       // Reference for storing messages
       const messageRef = push(ref(realTimeDb, `chats/${user.uid}/${sessionId}/${chatId}`));
@@ -316,7 +320,7 @@ const handleChatSubmit = async () => {
       // Store message
       await set(messageRef, {
         text: message,
-        sender: profileData.name || "Unknown",
+        sender: profileData?.name || "Unknown",
         timestamp: Date.now(),
       })
         .then(() => {
@@ -628,7 +632,42 @@ const handleExport = async (format) => {
     }  
   };
   
+  //function to handle Java code generation
+  const handleJavaCode = async () => {
+  if (!output.trim()) return; // Avoid empty submissions
 
+  try {
+    const response = await fetch(`${BASE_URL}/generate_programming_code`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        code: output, // Plantuml code as input
+        diagram_type: activeDiagram.name, // Diagram type (e.g., "Class Diagram")
+      }),
+    });
+
+    const data = await response.json();
+
+    if (data.error) {
+      console.error("Error from backend:", data.error);
+      alert(`Error: ${data.error}`);
+      return;
+    }
+
+    console.log("Generated Java Code:", data.generated_code);
+
+    // Update the editor with the generated code
+    setJavaCode(data.generated_code); // Update Java code
+    if (aceEditorRef.current) {
+      aceEditorRef.current.editor.setValue(data.generated_code);
+    }
+  } catch (error) {
+    console.error("Error generating java code", error);
+    setOutput("An error occurred while generating java code. Please try again.");
+  }
+};
 
   // Fuction to handle signout
   const handleSignOut = async () => {
@@ -928,11 +967,11 @@ style={{ height: "500px" }}
     </div>
   ) : activeTab === "Generate Code" ? (
     <AceEditor
-    mode="text"
-    theme="github"
-    name="plantuml-editor"
-    value={output}
-    onChange={newValue => setOutput(newValue)}
+    mode="java"
+    theme="chrome"
+    name="java-editor"
+    value={javaCode}
+    onChange={newValue => setJavaCode(newValue)}
     width="100%"
     height="400px"
     fontSize={14}
@@ -961,62 +1000,85 @@ style={{ height: "500px" }}
           setInputText(e.target.value);
           setMessage(e.target.value);
           handleInputResize();
-          }
-        }
+        }}
         className="flex-grow px-4 py-2 rounded-md border border-gray-300"
       />
     </div>
 
-    <button 
-  onClick={handleCombinedSubmit}
-  disabled={isLoading}
-  className={`w-full py-2 text-white rounded-md flex items-center justify-center gap-2 ${
-    isLoading ? "opacity-50 cursor-not-allowed" : "bg-red-700 hover:bg-gray-800"
-  }`}
->
-  {activeTab === "Chat" ? (
-    <>
-      Submit
-      <svg
-        className="w-5 h-5 text-white"
-        aria-hidden="true"
-        xmlns="http://www.w3.org/2000/svg"
-        fill="currentColor"
-        viewBox="0 0 24 24"
-      >
-        <path
-          fillRule="evenodd"
-          d="M10.271 5.575C8.967 4.501 7 5.43 7 7.12v9.762c0 1.69 1.967 2.618 3.271 1.544l5.927-4.881a2 2 0 0 0 0-3.088l-5.927-4.88Z"
-          clipRule="evenodd"
-        />
-      </svg>
-    </>
-  ) : (
-    <>
-      <svg
-        className="w-5 h-5 text-white"
-        aria-hidden="true"
-        xmlns="http://www.w3.org/2000/svg"
-        fill="none"
-        viewBox="0 0 24 24"
-      >
-        <path
-          stroke="currentColor"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth="2"
-          d="m14.304 4.844 2.852 2.852M7 7H4a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h11a1 1 0 0 0 1-1v-4.5m2.409-9.91a2.017 2.017 0 0 1 0 2.853l-6.844 6.844L8 14l.713-3.565 6.844-6.844a2.015 2.015 0 0 1 2.852 0Z"
-        />
-      </svg>
-      Draw Diagram
-    </>
-  )}
-</button>
-
-
+    <button
+      onClick={
+        activeTab === "Chat"
+          ? handleCombinedSubmit // Submit message in Chat tab
+          : activeTab === "Code"
+          ? saveEditedCode // Save edited code in Code tab
+          : activeTab === "Generate Code"
+          ? handleJavaCode // Generate code in Generate Code tab
+          : null
+      }
+      disabled={isLoading}
+      className={`w-full py-2 text-white rounded-md flex items-center justify-center gap-2 ${
+        isLoading ? "opacity-50 cursor-not-allowed" : "bg-red-700 hover:bg-gray-800"
+      }`}
+    >
+      {activeTab === "Chat" ? (
+        <>
+          Submit
+          <svg
+            className="w-5 h-5 text-white"
+            aria-hidden="true"
+            xmlns="http://www.w3.org/2000/svg"
+            fill="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              fillRule="evenodd"
+              d="M10.271 5.575C8.967 4.501 7 5.43 7 7.12v9.762c0 1.69 1.967 2.618 3.271 1.544l5.927-4.881a2 2 0 0 0 0-3.088l-5.927-4.88Z"
+              clipRule="evenodd"
+            />
+          </svg>
+        </>
+      ) : activeTab === "Code" ? (
+        <>
+          <svg
+            className="w-5 h-5 text-white"
+            aria-hidden="true"
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke="currentColor"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth="2"
+              d="m14.304 4.844 2.852 2.852M7 7H4a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h11a1 1 0 0 0 1-1v-4.5m2.409-9.91a2.017 2.017 0 0 1 0 2.853l-6.844 6.844L8 14l.713-3.565 6.844-6.844a2.015 2.015 0 0 1 2.852 0Z"
+            />
+          </svg>
+          Draw Diagram
+        </>
+      ) : activeTab === "Generate Code" ? (
+        <>
+          Generate Code
+          <svg
+            className="w-5 h-5 text-white"
+            aria-hidden="true"
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke="currentColor"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth="2"
+              d="M12 7.757v8.486M7.757 12h8.486M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
+            />
+          </svg>
+        </>
+      ) : null}
+    </button>
   </div>
 )}
-
         </aside>
 
         <main className="flex-1 bg-white px-6 py-6 relative">
