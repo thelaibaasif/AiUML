@@ -698,3 +698,35 @@ async def set_color(request: Request):
     except Exception as e:
         print(f"Failed to apply color: {e}")
         return {"error": f"Failed to apply colors: {str(e)}"}
+
+
+# --------------------------------- Generate Programming Language Code ------------------------------ #
+
+@app.post("/generate_programming_code")
+async def generate_programming_code(request: Request):
+    data = await request.json()
+    code = data.get("code", "")
+    diagram_type = data.get("diagram_type", "")
+
+    print(f"Generating code for {diagram_type} diagram...")
+    print(f"PlantUML Code:\n{code}")
+
+    if not code:
+        return {"error": "No code provided."}
+
+    try:
+        # Initialize client inside function
+        HF_TOKEN = os.environ.get("HF_TOKEN")
+        client = Client("vinzur/PlantUML-To-Code-Converter", hf_token=HF_TOKEN)
+
+        result = client.predict(
+            query=code,
+            diagram_type=diagram_type,
+            api_name="/predict"
+        )
+
+        return {
+            "generated_code": result
+        }
+    except Exception as e:
+        return {"error": f"Code generation failed: {str(e)}"}
