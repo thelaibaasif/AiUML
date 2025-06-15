@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import { auth, db } from "../../firebase"; // Import Firebase auth
 import { doc, getDoc } from "firebase/firestore";
-import { ref, push, set, update } from "firebase/database";
+import { ref, push, set, update,get } from "firebase/database";
 import {  realTimeDb } from "../../firebase";
 import { signOut } from "firebase/auth";
 import { useNavigate } from "react-router-dom";
@@ -52,12 +52,7 @@ const EditorPage = () => {
   const [javaCode, setJavaCode] = useState(""); // For Java code
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
-  const [historyData, setHistoryData] = useState([
-    "UseCase Diagram @123",
-    "Class Diagram @123",
-    "Sequence Diagram @123",
-    "ERD Diagram @123",
-  ]);
+  const [historyData, setHistoryData] = useState([]);
   const colorsRef = useRef(null);
   const customizeRef = useRef(null);
   const diagramRef = useRef(null);
@@ -153,6 +148,68 @@ const EditorPage = () => {
     
       fetchUserData();
     }, []);
+
+// ---------------------------------- Fetching history data from DB ---------------------------------- //
+
+useEffect(() => {
+  if (activeTab === "Recent"){
+
+    console.log("Fetching History...");
+    const user = auth.currentUser;
+    if (!user) return;
+
+    const fetchHistory = async () => {
+      const userId = user.uid;
+      const userSessionsRef = ref(realTimeDb, `chats/${userId}`);
+
+      try {
+        const snapshot = await get(userSessionsRef);
+        const data = snapshot.val();
+        console.log("Sessions Snapshot:", data);
+        if (!data) return;
+
+        const history = [];
+
+        for (const sessionKey in data) {
+          const chats = data[sessionKey];
+          for (const chatKey in chats) {
+            const messages = chats[chatKey];
+
+            for (const messageKey in messages) {
+              const message = messages[messageKey];
+
+              // Only store AI-generated responses with diagram code
+              if (message.sender === "AiUML" && message.text) {
+                const diagramName = message.diagramName || "Untitled Diagram";
+                const createdDate = message.createdDate || new Date(message.timestamp || Date.now()).toLocaleDateString();
+                const diagramType = message.diagramType || "Unknown";
+
+                history.push({
+                  diagramName,
+                  createdDate,
+                  code: message.text,
+                  diagramType,
+                  sessionId: sessionKey,
+                  chatId: chatKey,
+                  messageId: messageKey,
+                });
+              }
+            }
+          }
+        }
+
+        // Sort by newest
+        history.sort((a, b) => new Date(b.createdDate) - new Date(a.createdDate));
+        console.log("Final history:", history);
+        setHistoryData(history);
+    } catch (error) {
+      console.error("Error fetching history:", error);
+    }
+  };
+
+    fetchHistory();
+  }
+}, [activeTab]);
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -338,6 +395,35 @@ const handleChatSubmit = async () => {
     }
   };
 
+  const renderHistoryCode = async() => {
+    try {
+      if (!output.trim()) return;
+
+      console.log("Sending code to be rendered");
+
+      const response = await fetch(`${BASE_URL}/process`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ text: output, skip_model: true, diagram_type: activeDiagram.name }), // Skip model when editing
+      });
+
+      const data = await response.json();
+
+      //  Update frontend state
+      setOutput(data.generated_code);
+      setActiveDiagram((prev) => ({
+        ...prev,
+        image: data.diagram_url,
+        name: activeDiagram.name,
+      }));
+    } catch (error) {
+      console.error("Error Rendering Diagram:", error);
+    }
+
+  }
+
 // ------------------------------------------ Saving Edited Code (Edit) --------------------------------------- //
 
   const saveEditedCode = async() => {
@@ -370,6 +456,8 @@ const handleChatSubmit = async () => {
               text: data.generated_code,
               sender: "AiUML",
               timestamp: Date.now(),
+              diagramType: activeDiagram?.name || "Diagram",
+              diagramName: `${activeDiagram?.name || "Diagram"} - ${new Date(Date.now()).toISOString().split("T")[0]}`,
             });
 
             console.log("Updated code saved to DB");
@@ -397,6 +485,8 @@ const handleChatSubmit = async () => {
               text: data.generated_code,
               sender: "AiUML",
               timestamp: Date.now(),
+              diagramType: activeDiagram?.name || "Diagram",
+              diagramName: `${activeDiagram?.name || "Diagram"} - ${new Date(Date.now()).toISOString().split("T")[0]}`,
             });
 
             console.log("Updated code saved to DB");
@@ -445,6 +535,8 @@ const handleChatSubmit = async () => {
           text: output, // Saving the code here
           sender: "AiUML",
           timestamp: Date.now(),
+          diagramType: activeDiagram?.name || "Diagram",
+          diagramName: `${activeDiagram?.name || "Diagram"} - ${new Date(Date.now()).toISOString().split("T")[0]}`,
         });
         sessionStorage.setItem("messageId", messageId);
         console.log("Generated code saved:", output);
@@ -460,7 +552,9 @@ const handleChatSubmit = async () => {
           text: output, // Saving the code here
           sender: "AiUML",
           timestamp: Date.now(),
-        });
+          diagramType: activeDiagram?.name || "Diagram",
+          diagramName: `${activeDiagram?.name || "Diagram"} - ${new Date(Date.now()).toISOString().split("T")[0]}`,
+          });
         sessionStorage.setItem("messageId", messageId);
         console.log("Generated code saved:", output);
       }
@@ -549,6 +643,8 @@ const handleExport = async (format) => {
             text: data.enhanced_code,
             sender: "AiUML",
             timestamp: Date.now(),
+            diagramType: activeDiagram?.name || "Diagram",
+            diagramName: `${activeDiagram?.name || "Diagram"} - ${new Date(Date.now()).toISOString().split("T")[0]}`,
           });
 
           console.log("Updated code saved to DB");
@@ -582,6 +678,8 @@ const handleExport = async (format) => {
             text: data.enhanced_code,
             sender: "AiUML",
             timestamp: Date.now(),
+            diagramType: activeDiagram?.name || "Diagram",
+            diagramName: `${activeDiagram?.name || "Diagram"} - ${new Date(Date.now()).toISOString().split("T")[0]}`,
           });
 
           console.log("Updated code saved to DB");
@@ -909,63 +1007,57 @@ style={{ height: "500px" }}
         </thead>
         <tbody className="text-gray-900">
   {historyData
-    .filter((title) =>
-      title.toLowerCase().includes(searchQuery.toLowerCase())
-    )
-    .map((title, index) => (
-      <tr key={index} className="border-t border-gray-200 text-center">
-        <td className="py-4">{title}</td>
-        <td className="py-4">1/2/21</td>
+  .filter((item) =>
+    item.diagramName.toLowerCase().includes(searchQuery.toLowerCase())
+  )
+  .map((item, index) => (
+    <tr key={index} className="border-t border-gray-200 text-center">
+      <td className="py-4">{item.diagramName}</td>
+      <td className="py-4">{item.createdDate}</td>
+      <td className="py-4">
+        <button
+          onClick={async () => {
+            setOutput(item.code); // restore the diagram
+            renderHistoryCode();
+            sessionStorage.setItem("sessionId", item.sessionId);
+            sessionStorage.setItem("chatId", item.chatId)
+            const user = auth.currentUser;
+            if (!user) return;
 
-        {/* Restore Button Column */}
-        <td className="py-4">
-          <button className="bg-red-700 p-2 rounded-full">
-            <svg
-              className="w-5 h-5 text-white"
-              aria-hidden="true"
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-            >
-              <path
-                stroke="currentColor"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                d="M17.651 7.65a7.131 7.131 0 0 0-12.68 3.15M18.001 4v4h-4m-7.652 8.35a7.13 7.13 0 0 0 12.68-3.15M6 20v-4h4"
-              />
-            </svg>
-          </button>
-        </td>
+            const chatRef = ref(realTimeDb, `chats/${user.uid}/${sessionId}/${chatId}`);
+            const snapshot = await get(chatRef);
+            const data = snapshot.val();
 
-        {/* Delete Button Column */}
-        <td className="py-4">
-          <button
-            onClick={() => {
-              const updated = historyData.filter((_, i) => i !== index);
-              setHistoryData(updated);
-            }}
-            className="bg-red-700 p-2 rounded-full "
-          >
-            <svg
-              className="w-5 h-5 text-white"
-              aria-hidden="true"
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-            >
-              <path
-                stroke="currentColor"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                d="m15 9-6 6m0-6 6 6m6-3a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
-              />
-            </svg>
-          </button>
-        </td>
-      </tr>
-    ))}
+            if (!data) return;
+
+            const userPrompts = Object.values(data)
+              .filter((msg) => msg.sender !== "AiUML")
+              .map((msg) => ({
+                text: msg.text || "",
+                timestamp: msg.timestamp || 0,
+              }));
+
+            setChatMessages(userPrompts);
+          }}
+          className="bg-red-700 p-2 rounded-full"
+        >
+          {/* restore icon */}
+        </button>
+      </td>
+      <td className="py-4">
+        <button
+          onClick={() => {
+            const updated = [...historyData];
+            updated.splice(index, 1);
+            setHistoryData(updated);
+          }}
+          className="bg-red-700 p-2 rounded-full"
+        >
+          {/* delete icon */}
+        </button>
+      </td>
+    </tr>
+  ))}
 </tbody>
 
       </table>
