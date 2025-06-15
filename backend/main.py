@@ -17,7 +17,10 @@ app = FastAPI()
 # Allow CORS for frontend connection
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000"],  
+    allow_origins=[
+        "http://localhost:3000",           # for local dev
+        "https://aiuml.onrender.com",      # for deployed frontend
+    ],  
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
