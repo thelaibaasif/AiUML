@@ -31,7 +31,8 @@ import "ace-builds/src-noconflict/theme-chrome";
 //const DEPLOYED_URL = "https://aiuml-backend.onrender.com";
 const BASE_URL = "https://aiuml-backend.onrender.com";
 
-const EditorPage = ({isGuest}) => {
+const EditorPage = () => {
+ 
   const [showSaveModal, setShowSaveModal] = useState(false);
   const [showDiagramDropdown, setShowDiagramDropdown] = useState(false);
   const [showCustomizeDropdown, setShowCustomizeDropdown] = useState(false);
@@ -68,6 +69,9 @@ const EditorPage = ({isGuest}) => {
   const handleResetZoom = () => setZoomLevel(1);
   const sessionId = sessionStorage.getItem("sessionId");
   const chatId = sessionStorage.getItem("chatId");
+  const [isGuest, setIsGuest] = useState(() => {
+    return sessionStorage.getItem("isGuest") === "true";
+  });
   const [message, setMessage] = useState("");
   const [profileData, setProfileData] = useState(null);
   const [, setSessionId] = useState(null); //  Just defining setter
@@ -78,6 +82,7 @@ const EditorPage = ({isGuest}) => {
 // -------------------------- Checking if the user is guest or not ---------------------------------------------- //
 
   useEffect(() => {
+    console.log("Checking if the user is guest...");
     const sessionAlreadyExists = sessionStorage.getItem("sessionId");
     const chatAlreadyExists = sessionStorage.getItem("chatId");
 

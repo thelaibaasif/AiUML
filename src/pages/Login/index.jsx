@@ -18,7 +18,7 @@ const Login = () => {
   const [showModal, setShowModal] = useState(false);
   const [modalContent, setModalContent] = useState("");
   const [isAgreed, setIsAgreed] = useState(false);
-  
+  const [isGuest, setIsGuest] = useState(false);
   const [sessionId, setSessionId] = useState(null);
   const newSessionId = useRef(null);
   const [chatId, setChatId] = useState(null);
@@ -128,6 +128,11 @@ const Login = () => {
 
   // Function for session creation in rrealtime db
   const createSession = async () => {
+    console.log("Removing guest session if exists...");
+    setIsGuest(false);
+    sessionStorage.removeItem("isGuest");
+    sessionStorage.removeItem("sessionId");
+    sessionStorage.removeItem("chatId");
     console.log("Creating Session...");
     const user = auth.currentUser;
     if (user) {

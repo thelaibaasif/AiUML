@@ -11,6 +11,7 @@ const Header = ({ setIsDark, setIsGuest  }) => {
   const handleGetStarted = () => {
     console.log("Guest Mode Enabled");
     setIsGuest(true); // ✅ Set guest mode
+    sessionStorage.setItem("isGuest", "true");
     navigate('/EnhancedEditor'); // ✅ Redirect to editor
   };
 
