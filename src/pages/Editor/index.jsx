@@ -24,6 +24,7 @@ import "ace-builds/src-noconflict/mode-text";
 import "ace-builds/src-noconflict/theme-github";
 //import TokenLimitedInput from "../../components/TokenLimitedInput";
 
+//deployment urls
 const LOCAL_URL = "http://localhost:8000";
 const DEPLOYED_URL = "https://aiuml-backend.onrender.com";
 const BASE_URL = window.location.hostname === "localhost" ? LOCAL_URL : DEPLOYED_URL;
