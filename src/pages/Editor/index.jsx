@@ -748,6 +748,20 @@ const handleExport = async (format) => {
       </svg>
     ),
   },
+  {
+    tab: "Generate Code",
+    icon: (
+      <svg
+        className="w-5 h-5 mr-2"
+        xmlns="http://www.w3.org/2000/svg"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke="currentColor"
+      >
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="m8 8-4 4 4 4m8 0 4-4-4-4m-2-3-4 14" />
+      </svg>
+    ),
+  },
 ].map(({ tab, icon }) => (
 
                 <button
@@ -908,6 +922,24 @@ style={{ height: "500px" }}
 
       </table>
     </div>
+  ) : activeTab === "Generate Code" ? (
+    <AceEditor
+    mode="text"
+    theme="github"
+    name="plantuml-editor"
+    value={output}
+    onChange={newValue => setOutput(newValue)}
+    width="100%"
+    height="400px"
+    fontSize={14}
+    setOptions={{
+      enableBasicAutocompletion: true,
+      enableLiveAutocompletion: true,
+      highlightActiveLine: true,
+      showLineNumbers: true,
+      tabSize: 2,
+    }}
+  />
   ) : null}
 </div>
 
